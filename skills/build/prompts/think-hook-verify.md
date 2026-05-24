@@ -19,7 +19,7 @@ Read these files for context:
 
 1. Read `verify-report.md` and determine: Did verification pass or fail?
 
-2. **If PASS (all checks passed):**
+1. **If PASS (all checks passed):**
    - Invoke the **verify-success** thinking pack.
    - Read the prompt from `skills/think/prompts/verify-success.md`.
    - Fill the input materials from the build state:
@@ -32,7 +32,7 @@ Read these files for context:
    - Execute the analysis steps from the prompt.
    - Write the output to `{state_dir}/think-verify-success.md` and `{state_dir}/think-verify-success.json`.
 
-3. **If FAIL (any checks failed):**
+1. **If FAIL (any checks failed):**
    - Invoke the **verify-failure** thinking pack.
    - Read the prompt from `skills/think/prompts/verify-failure.md`.
    - Fill the input materials from the build state:
@@ -46,7 +46,25 @@ Read these files for context:
    - Execute the analysis steps from the prompt.
    - Write the output to `{state_dir}/think-verify-failure.md` and `{state_dir}/think-verify-failure.json`.
 
-4. **Based on the thinking pack result, write a recommendation to `{state_dir}/think-recommendation.md`:**
+1. **If PASS, optionally run evidence-strength as quality gate:**
+   - If the verification evidence feels thin (e.g., only one verification method, or results are borderline), invoke the **evidence-strength** thinking pack.
+   - Read the prompt from `skills/think/prompts/evidence-strength.md`.
+   - Fill input materials:
+     - 待支持的主张 = "the build goal has been achieved"
+     - 已收集的证据 = the verification method outputs
+     - 验证方法 = the verification methods used
+     - 上游分析 = the verify-success conclusion
+   - Execute and write output to `{state_dir}/think-evidence-strength.md` and `{state_dir}/think-evidence-strength.json`.
+   - If evidence-strength concludes "证据不足", downgrade the recommendation to "re-verify" or "narrow-scope".
+
+1. **If FAIL, optionally run reproduce to confirm the failure is real:**
+   - If the failure might be intermittent (e.g., flaky tests, environment-dependent), invoke the **reproduce** thinking pack.
+   - Read the prompt from `skills/think/prompts/reproduce.md`.
+   - Fill input materials from the build state.
+   - Execute and write output to `{state_dir}/think-reproduce.md` and `{state_dir}/think-reproduce.json`.
+   - If reproduce concludes "无法复现", consider downgrading to "narrow-scope" or "re-verify".
+
+1. **Based on the thinking pack result(s), write a recommendation to `{state_dir}/think-recommendation.md`:**
 
 ```markdown
 # Think Recommendation
@@ -69,11 +87,13 @@ Choose one:
 - **proceed**: Success is genuine, proceed to Phase 6 Knowledge Extraction
 - **deep-analysis**: Root cause is complex, run root-cause and main-contradiction packs before fixing
 
+Note: If evidence-strength or reproduce were run, their conclusions should inform this recommendation. Evidence-strength "证据不足" → prefer re-verify or narrow-scope. Reproduce "无法复现" → prefer narrow-scope or re-verify.
+
 ## Reasoning
 [Why this recommendation]
 ```
 
-5. Append a log entry to `{state_dir}/session.md`:
+1. Append a log entry to `{state_dir}/session.md`:
 
 ```
 ## Think Analysis <timestamp>

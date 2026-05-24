@@ -81,6 +81,7 @@ downstream:
 {
   "pack": "root-cause",
   "timestamp": "<ISO 8601>",
+  "conclusion": "<根因结论摘要>",
   "candidate_causes": [
     {"cause": "...", "impact": "高|中|低", "controllability": "高|中|低", "evidence": "强|中|弱"}
   ],

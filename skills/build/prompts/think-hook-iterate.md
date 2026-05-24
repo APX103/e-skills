@@ -21,14 +21,24 @@ Read these files:
    - Did issues decrease across rounds?
    - Is the current state stable or fragile?
 
-2. If the previous think-recommendation was "deep-analysis" and root-cause was NOT yet run:
+1. If the previous think-recommendation was "deep-analysis" and root-cause was NOT yet run:
    - Invoke the **root-cause** thinking pack using `skills/think/prompts/root-cause.md`.
    - Write output to `{state_dir}/think-root-cause.md` and `{state_dir}/think-root-cause.json`.
    - If root-cause finds multiple system conditions, also invoke **main-contradiction** using `skills/think/prompts/main-contradiction.md`.
    - Write output to `{state_dir}/think-main-contradiction.md` and `{state_dir}/think-main-contradiction.json`.
    - Update the recommendation based on the deeper analysis.
 
-3. Write a recommendation to `{state_dir}/think-iterate-recommendation.md`:
+1. If the fix cycle has stalled (2+ rounds without improvement):
+   - Invoke **assumption-surfacing** using `skills/think/prompts/assumption-surfacing.md` to check if broken assumptions are causing the stall.
+   - Write output to `{state_dir}/think-assumption-surfacing.md` and `{state_dir}/think-assumption-surfacing.json`.
+   - If assumptions are found violated, update the recommendation to "pivot".
+
+1. If the fix cycle has introduced significant changes:
+   - Invoke **second-order-effects** using `skills/think/prompts/second-order-effects.md` to check for cascading consequences.
+   - Write output to `{state_dir}/think-second-order-effects.md` and `{state_dir}/think-second-order-effects.json`.
+   - If high-risk chains are found, add them to the recommendation reasoning.
+
+1. Write a recommendation to `{state_dir}/think-iterate-recommendation.md`:
 
 ```markdown
 # Iterate Recommendation
@@ -51,7 +61,7 @@ Choose one:
 [Why this recommendation]
 ```
 
-4. Append to `{state_dir}/session.md`:
+1. Append to `{state_dir}/session.md`:
 
 ```
 ## Iterate Think Analysis <timestamp>

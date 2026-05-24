@@ -9,7 +9,7 @@ downstream:
   - condition: "假失败"
     next: next-experiment
   - condition: "不确定"
-    next: "补全证据"
+    next: evidence-strength
 ---
 
 # 真没成吗包
@@ -91,7 +91,7 @@ downstream:
   "preserved_value": ["..."],
   "risks": ["..."],
   "next_action": "...",
-  "downstream_pack": "root-cause | next-experiment | 补全证据"
+  "downstream_pack": "root-cause | next-experiment | evidence-strength"
 }
 ```
 
@@ -99,4 +99,4 @@ downstream:
 
 - 真失败 → root-cause（区分失败类型，找到根因）
 - 假失败 → next-experiment（保留有效信号，重设指标或时间窗口）
-- 不确定 → 补全证据（增加观察时间或换指标）
+- 不确定 → evidence-strength（增加观察时间或换指标）

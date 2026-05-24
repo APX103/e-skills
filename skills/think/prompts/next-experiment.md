@@ -82,6 +82,7 @@ downstream:
 {
   "pack": "next-experiment",
   "timestamp": "<ISO 8601>",
+  "conclusion": "<实验设计结论>",
   "hypothesis": "...",
   "minimal_action": "...",
   "changed_variable": "...",

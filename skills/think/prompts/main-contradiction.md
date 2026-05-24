@@ -79,6 +79,7 @@ downstream:
 {
   "pack": "main-contradiction",
   "timestamp": "<ISO 8601>",
+  "conclusion": "<主要矛盾判定>",
   "all_contradictions": [
     {"contradiction": "...", "impact_scope": ["..."], "leverage": "高|中|低"}
   ],

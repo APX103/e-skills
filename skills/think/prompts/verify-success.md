@@ -7,7 +7,7 @@ downstream:
   - condition: "证据强"
     next: root-cause
   - condition: "证据弱"
-    next: "复现实验或缩小范围"
+    next: reproduce
   - condition: "假成功"
     next: root-cause
 ---
@@ -92,13 +92,13 @@ downstream:
   "strongest_counter_evidence": "...",
   "risks": ["..."],
   "next_action": "...",
-  "downstream_pack": "root-cause | 复现实验"
+  "downstream_pack": "root-cause | reproduce"
 }
 ```
 
 ## 下游接口
 
 - 真成功 + 证据强 → root-cause（找到可复制成因）
-- 真成功 + 证据弱 → 复现实验（先确认可复现再放大）
+- 真成功 + 证据弱 → reproduce（先确认可复现再放大）
 - 假成功 → root-cause（找到真正成因）
 - 不确定 → 补充证据（缩小实验范围或增加样本）
