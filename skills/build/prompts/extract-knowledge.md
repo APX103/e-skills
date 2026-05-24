@@ -207,3 +207,7 @@ After writing all learnings, append a summary entry to `{state_dir}/session.md`:
 - Respect existing content. Never overwrite knowledge files. Always append.
 - If no learnings are found for a phase, skip that file rather than writing an empty one.
 - If the session was trivially simple and produced no useful learnings, that is fine. Not every session yields insights. Write only what is genuinely useful.
+
+## Structured Metrics
+
+After writing learnings and appending the summary to session.md, also dispatch the metrics extraction subagent with `./prompts/extract-metrics.md` filled: `{state_dir}`, `{knowledge_dir}`. This produces a structured JSON metrics record alongside the text summary above. The metrics extraction is separate from knowledge extraction to keep concerns isolated.
