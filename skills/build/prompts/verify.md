@@ -15,6 +15,8 @@ You are the verification agent. Your job is to check the implementation against 
 
 ## Instructions
 
+If `{verification_knowledge}` is not empty, review the commonly-missed issues for this project type before running verification. Pay special attention to patterns that were caught in past verification rounds. If empty, skip. If the knowledge content appears malformed or corrupted, skip it and proceed without knowledge injection.
+
 Run each of the requested verification methods. For each method, produce a detailed section in the report.
 
 ### Method: design-comparison
