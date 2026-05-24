@@ -27,6 +27,16 @@ session.md           # Master log: head=goal, tail=progress
 understanding.md     # Phase 1 output
 plan.md              # Phase 2 output
 verify-report.md     # Phase 4 output
+think-verify-success.md   # Phase 4.5 verify-success analysis
+think-verify-success.json
+think-verify-failure.md   # Phase 4.5 verify-failure analysis
+think-verify-failure.json
+think-recommendation.md   # Phase 4.5 recommendation
+think-root-cause.md       # Deep analysis (if triggered)
+think-root-cause.json
+think-main-contradiction.md
+think-main-contradiction.json
+think-iterate-recommendation.md  # Post-fix recommendation
 iteration-N/         # Per-iteration details
 ```
 
@@ -58,13 +68,18 @@ digraph { rankdir=TB; node[shape=box];
   P0[shape=diamond label="P0 Contract" color=blue];
   P1[label="P1 Understand"]; P2[label="P2 Plan"];
   P3[label="P3 Execute"]; P4[shape=diamond label="P4 Verify"];
-  P5[label="P5 Fix"]; CL[label="Compress Log"];
+  P45[label="P4.5 Think"]; P5[label="P5 Fix"];
+  CL[label="Compress Log"];
   P6[label="P6 Extract Knowledge" color=purple];
   P7[label="P7 Evolve Prompts" color=orange];
   Done[shape=oval label="Done" color=green];
-  P0->P1->P2->P3->P4;
-  P4->P5[label="issues"]; P5->P4[label="re-verify"];
-  P4->CL[label="pass"];
+  P0->P1->P2->P3->P4->P45;
+  P45->P5[label="continue-fixing"];
+  P45->P5[label="deep-analysis"];
+  P45->P3[label="narrow-scope"];
+  P45->P4[label="re-verify"];
+  P45->CL[label="proceed"];
+  P5->P4[label="re-verify"];
   CL->P1[label="iter < N"];
   CL->P6[label="iter >= N"];
   P6->P7[label="3+ sessions"];
@@ -115,6 +130,19 @@ Fill `{verification_knowledge}`: read `$HOME/.claude/build-knowledge/knowledge/v
 
 Read `verify-report.md`: all PASS → this iteration complete. Any FAIL/PARTIAL → Phase 5.
 
+## Phase 4.5: Think Analysis (Post-Verification)
+
+Runs after every Phase 4 verification. Provides deep analysis of the verification result before deciding whether to fix or proceed.
+
+1. Dispatch subagent (`general-purpose`) with `./prompts/think-hook-verify.md`: `{state_dir}`, `{verification_methods}`.
+2. Read `{state_dir}/think-recommendation.md`.
+3. Follow the recommendation:
+   - `continue-fixing` → proceed to Phase 5 Fix. If the think analysis identified a specific root cause, include it in the fix context.
+   - `narrow-scope` → go back to Phase 3 Execution with a reduced scope (the think analysis will specify what to focus on).
+   - `re-verify` → go back to Phase 4 with adjusted verification methods.
+   - `proceed` → skip Phase 5, go directly to the iteration loop (this iteration is done).
+   - `deep-analysis` → the think-hook-verify agent has already started root-cause analysis. Read `{state_dir}/think-root-cause.md` if it exists, then proceed to Phase 5 Fix with focused scope.
+
 ## Phase 5: Iteration Fix
 
 1. Increment `fix_round` counter (starts at 1, increments each time Phase 5 runs within the same iteration).
@@ -145,6 +173,12 @@ INNER LOOP (fix rounds within one iteration):
 1. Initialize `current_iteration = 1`.
 2. Execute Phases 1-5 for `current_iteration`.
 3. After iteration completes (Phase 5 convergence or stall):
+   - Dispatch think-hook-iterate subagent with `./prompts/think-hook-iterate.md`: `{state_dir}`, `{current_iteration}`.
+   - Read `{state_dir}/think-iterate-recommendation.md`. Follow the recommendation:
+     - `stop-iterate` → proceed to Phase 6.
+     - `next-iteration` → continue to next outer iteration below.
+     - `pivot` → go back to Phase 1 (re-understand) or Phase 2 (re-plan).
+     - `continue-fixing` → re-enter Phase 5 with additional fix rounds.
    - If `current_iteration < N`:
      - Increment `current_iteration`.
      - If `session.md` >200 lines, dispatch compress-log subagent.
@@ -201,7 +235,9 @@ Runs after Phase 6 if the knowledge store has 3+ sessions with metrics.
 | Plan | `Plan` | Reads understanding.md + knowledge injection |
 | Execute | `general-purpose`/step | One step per call + knowledge injection |
 | Verify | `general-purpose` | Reads all outputs + knowledge injection |
+| Think (4.5) | `general-purpose` | Post-verify analysis, invokes thinking packs |
 | Fix | `general-purpose` | Reads verify-report |
+| Think (iterate) | `general-purpose` | Post-fix analysis, may invoke root-cause/main-contradiction |
 | Extract Knowledge | `general-purpose` | Post-loop, reads all session files |
 | Compact Knowledge | `general-purpose` | Triggered when knowledge files >~200 lines |
 | Evolve Prompts | `general-purpose` | Post-extraction, reads knowledge + metrics, modifies prompts with versioning |
