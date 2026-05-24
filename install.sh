@@ -29,7 +29,8 @@ for skill_dir in "$SKILLS_DIR"/skills/*/; do
     case "$ACTION" in
         install|update)
             if [ -L "$target" ]; then
-                ln -sf "$skill_dir" "$target"
+                rm "$target"
+                ln -s "$skill_dir" "$target"
                 echo "  $skill_name: symlink updated"
             elif [ -d "$target" ]; then
                 echo "  $skill_name: exists as directory (not symlink), skipping. Delete $target manually first."

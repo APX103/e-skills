@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Research Skill 使用指南</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1b1f24;
+      --muted: #5d6673;
+      --line: #d7dde5;
+      --paper: #f7f8fa;
+      --panel: #ffffff;
+      --green: #0f766e;
+      --blue: #2563eb;
+      --rose: #be123c;
+      --amber: #a16207;
+      --violet: #7c3aed;
+      --code: #f0f3f6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.58;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      min-height: 58vh;
+      display: grid;
+      align-items: center;
+      padding: 54px 0 42px;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--green);
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 840px;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 20px;
+    }
+
+    .quick {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 38px;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    .quick div {
+      background: var(--panel);
+      padding: 18px;
+      min-height: 108px;
+    }
+
+    .quick strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .quick span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    main {
+      padding: 34px 0 64px;
+    }
+
+    section {
+      padding: 34px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 22px 0 10px;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    code {
+      background: var(--code);
+      border: 1px solid #dce2ea;
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      margin: 12px 0 20px;
+      padding: 16px;
+      overflow: auto;
+      background: #111827;
+      color: #f8fafc;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    pre code {
+      background: transparent;
+      border: 0;
+      color: inherit;
+      padding: 0;
+    }
+
+    .note {
+      border-left: 4px solid var(--green);
+      background: #ecfdf5;
+      padding: 14px 16px;
+      margin: 18px 0;
+    }
+
+    .warn {
+      border-left-color: var(--amber);
+      background: #fffbeb;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .platform {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    .platform h3 {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mark {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+      flex: 0 0 auto;
+    }
+
+    .claude { background: var(--rose); }
+    .codex { background: var(--blue); }
+    .opencode { background: var(--green); }
+    .kimi { background: var(--amber); }
+    .hermes { background: var(--violet); }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .step {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 14px;
+      min-height: 118px;
+      position: relative;
+    }
+
+    .step b {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .step span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      margin: 14px 0;
+    }
+
+    .table th,
+    .table td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .table th {
+      background: #eef2f7;
+      font-weight: 700;
+    }
+
+    .table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    footer {
+      padding: 28px 0 48px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .quick,
+      .grid,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap hero">
+      <div>
+        <p class="eyebrow">Agent Skills / Research Workflow</p>
+        <h1>Research Skill 使用指南</h1>
+        <p class="lead">这个 skill 用来让 agent 承接长任务知识生产：研究、调研、思维实验、计算机科学实验、证据驱动的报告。它不是替代 <code>brainstorming</code>，而是把后续的研究闭环接过去。</p>
+        <div class="quick" aria-label="quick facts">
+          <div><strong>当前状态</strong><span>已安装到 <code>~/.claude/skills/research</code>，并已链接到 Codex 与 Hermes 目录。</span></div>
+          <div><strong>Claude Code</strong><span>可自动触发，也可用 <code>/research ...</code> 直接调用。</span></div>
+          <div><strong>Codex</strong><span>需要在新会话或重启后重新发现 skills；当前对话不会动态刷新。</span></div>
+          <div><strong>Hermes</strong><span>已链接到 <code>~/.hermes/skills/research</code>，可用 slash command。</span></div>
+          <div><strong>OpenCode / Kimi</strong><span>两者都支持兼容路径，具体见下方附录。</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <h2>一句话答案</h2>
+      <p>是的，Codex 也可以用这个 skill，但需要它的运行环境能发现 <code>SKILL.md</code>。我已经把本机的 <code>research</code> skill 放在仓库里，并分别链接到了 Claude Code、Codex、Hermes 常用的用户级 skills 目录。</p>
+      <div class="note">
+        <p><strong>重要：</strong>本轮 Codex 会话启动时还没有 <code>research</code> 这个 skill，所以这轮对话的系统 skill 列表不会自动长出来。下次启动 Codex 或开启新会话时，它才有机会进入可发现列表。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>什么时候用</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>你想做什么</th>
+            <th>应该用什么</th>
+            <th>例子</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>开放式研究、调研、思维实验</td>
+            <td><code>research</code></td>
+            <td>研究一下某种调度算法为什么在长上下文 agent 中更稳。</td>
+          </tr>
+          <tr>
+            <td>把模糊想法变成任务契约</td>
+            <td><code>brainstorming</code> 一次</td>
+            <td>先定义研究问题、证据标准、停止条件。</td>
+          </tr>
+          <tr>
+            <td>需要写代码、搭环境、跑 benchmark</td>
+            <td><code>build</code></td>
+            <td>实现两个 parser，跑对比实验，输出结果。</td>
+          </tr>
+          <tr>
+            <td>验证结果真假、分析失败、设计下一轮实验</td>
+            <td><code>think</code></td>
+            <td>用 <code>evidence-strength</code> 判断证据够不够。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>研究闭环</h2>
+      <div class="flow">
+        <div class="step"><b>1. Charter</b><span>定义研究问题、假设、证据标准、边界和停止条件。</span></div>
+        <div class="step"><b>2. Investigate</b><span>读文件、查资料、看日志、复现实象，先拿高信息密度证据。</span></div>
+        <div class="step"><b>3. Experiment</b><span>只改变一个关键变量，设计最小实验。</span></div>
+        <div class="step"><b>4. Review</b><span>判断成功或失败是否真实，检查证据强度和替代解释。</span></div>
+        <div class="step"><b>5. Synthesize</b><span>输出报告，把 claim 绑定到 evidence，留下可复用知识。</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Claude Code</h2>
+      <div class="grid">
+        <div class="platform">
+          <h3><span class="mark claude"></span>安装位置</h3>
+          <p>个人级 skill 放在：</p>
+          <pre><code>~/.claude/skills/research/SKILL.md</code></pre>
+          <p>这个仓库已经通过 symlink 安装到了这个位置：</p>
+          <pre><code>~/.claude/skills/research -> /Users/lijialun/work/engineer_skills/skills/research/</code></pre>
+        </div>
+        <div class="platform">
+          <h3><span class="mark claude"></span>调用方式</h3>
+          <p>自动触发：</p>
+          <pre><code>帮我研究一下 agent 长任务知识生产怎样做证据闭环</code></pre>
+          <p>显式触发：</p>
+          <pre><code>/research 研究一下多轮实验型 agent workflow，输出 charter、实验计划和报告</code></pre>
+        </div>
+      </div>
+      <p class="small">Claude Code 文档说明：skill 是包含 <code>SKILL.md</code> 的目录；可自动相关触发，也可用 <code>/skill-name</code> 直接调用；个人级路径是 <code>~/.claude/skills/&lt;skill-name&gt;/SKILL.md</code>。</p>
+    </section>
+
+    <section>
+      <h2>Codex</h2>
+      <div class="grid">
+        <div class="platform">
+          <h3><span class="mark codex"></span>安装位置</h3>
+          <p>本机已额外链接到 Codex 用户级 skills 目录：</p>
+          <pre><code>~/.codex/skills/research -> /Users/lijialun/work/engineer_skills/skills/research</code></pre>
+          <p>如果你在另一台机器上使用，可以手动复制或链接：</p>
+          <pre><code>mkdir -p ~/.codex/skills
+ln -s /path/to/engineer_skills/skills/research ~/.codex/skills/research</code></pre>
+        </div>
+        <div class="platform">
+          <h3><span class="mark codex"></span>调用方式</h3>
+          <p>推荐自然语言触发，让 Codex 根据 description 决定是否加载：</p>
+          <pre><code>用 research skill 研究一下 X，先写 research charter，再做实验设计</code></pre>
+          <p>如果 Codex 没有自动加载，直接点名：</p>
+          <pre><code>请使用 research skill：研究 X，并把证据、实验、结论分开记录</code></pre>
+        </div>
+      </div>
+      <div class="note warn">
+        <p><strong>注意：</strong>Codex 的可用 skill 列表通常在会话启动时确定。新装 skill 后，重启 Codex 或开启新会话最稳。</p>
+      </div>
+      <p class="small">OpenAI skills 仓库说明：Codex 可通过 <code>$skill-installer</code> 安装目录中的 skill；安装后需要重启 Codex 才能拾取新 skills。</p>
+    </section>
+
+    <section>
+      <h2>Hermes</h2>
+      <div class="grid">
+        <div class="platform">
+          <h3><span class="mark hermes"></span>安装位置</h3>
+          <p>Hermes 的主 skills 目录是：</p>
+          <pre><code>~/.hermes/skills/research/SKILL.md</code></pre>
+          <p>本机已经链接到这个位置：</p>
+          <pre><code>~/.hermes/skills/research -> /Users/lijialun/work/engineer_skills/skills/research</code></pre>
+        </div>
+        <div class="platform">
+          <h3><span class="mark hermes"></span>调用方式</h3>
+          <p>Hermes 会把已安装 skill 暴露成 slash command，所以可以直接调用：</p>
+          <pre><code>/research 研究一下 X，先写 Research Charter，再做实验和证据复盘</code></pre>
+          <p>也可以自然语言触发：</p>
+          <pre><code>请用 research skill 做一个证据驱动的调研：X。</code></pre>
+        </div>
+      </div>
+      <div class="note">
+        <p><strong>Hermes 很适合这个：</strong>它的 skills 系统本身就是渐进加载的 procedural memory，还支持外部 skill 目录。长任务研究时，建议让 Hermes 把产物写到 <code>.agent-log/&lt;timestamp&gt;-research/</code> 或你指定的项目目录。</p>
+      </div>
+      <p class="small">Hermes 官方仓库文档说明：skills 默认生活在 <code>~/.hermes/skills/</code>，每个已安装 skill 会自动成为 slash command，也可以通过自然语言加载；还可配置 external skill directories。</p>
+    </section>
+
+    <section>
+      <h2>OpenCode</h2>
+      <div class="grid">
+        <div class="platform">
+          <h3><span class="mark opencode"></span>兼容路径</h3>
+          <p>OpenCode 官方文档列出的路径包括：</p>
+          <pre><code>.opencode/skills/research/SKILL.md
+~/.config/opencode/skills/research/SKILL.md
+.claude/skills/research/SKILL.md
+~/.claude/skills/research/SKILL.md
+.agents/skills/research/SKILL.md
+~/.agents/skills/research/SKILL.md</code></pre>
+        </div>
+        <div class="platform">
+          <h3><span class="mark opencode"></span>本机建议</h3>
+          <p>因为本机已经有 <code>~/.claude/skills/research</code>，OpenCode 理论上可以从 Claude-compatible 全局路径发现它。</p>
+          <pre><code>opencode
+# 然后说：
+Use the research skill to investigate X.</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Kimi CLI</h2>
+      <div class="grid">
+        <div class="platform">
+          <h3><span class="mark kimi"></span>兼容路径</h3>
+          <p>Kimi Code CLI 文档写明会扫描用户级 brand group：</p>
+          <pre><code>~/.kimi/skills/
+~/.claude/skills/
+~/.codex/skills/</code></pre>
+          <p>以及 generic group：</p>
+          <pre><code>~/.config/agents/skills/
+~/.agents/skills/</code></pre>
+        </div>
+        <div class="platform">
+          <h3><span class="mark kimi"></span>本机状态</h3>
+          <p>本机没有发现 <code>kimi</code> 或 <code>kimi-cli</code> 命令，但如果之后安装 Kimi Code CLI，它应该能从 <code>~/.claude/skills/research</code> 或 <code>~/.codex/skills/research</code> 发现这个 skill。</p>
+          <pre><code>kimi
+# 或 kimi-cli，取决于你的安装方式
+请使用 research skill 研究 X。</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>推荐说法</h2>
+      <p>如果你想让 agent 用这个 skill，不要只说“想想 X”。更稳的 prompt 是把产物和边界也说出来：</p>
+      <pre><code>请使用 research skill 研究「X」。
+要求：
+1. 先写 Research Charter：问题、假设、证据标准、停止条件。
+2. 如果需要实验，设计最小实验，只改变一个关键变量。
+3. 把事实、假设、解释、未知分开。
+4. 最后输出 report.md 和 knowledge.md。</code></pre>
+      <p>如果是计算机科学研究，可以更具体：</p>
+      <pre><code>请使用 research skill 做一个小型 CS 研究：
+比较两种算法在数据集 Y 上的表现。
+允许自己搭环境、写 benchmark、跑实验。
+每轮实验后检查 evidence-strength，再决定是否继续。</code></pre>
+    </section>
+
+    <section>
+      <h2>本仓库文件</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>文件</th>
+            <th>用途</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>skills/research/SKILL.md</code></td>
+            <td>平台发现和主流程说明。</td>
+          </tr>
+          <tr>
+            <td><code>skills/research/prompts/charter.md</code></td>
+            <td>把开放式问题变成 Research Charter。</td>
+          </tr>
+          <tr>
+            <td><code>skills/research/prompts/experiment.md</code></td>
+            <td>设计最小可验证实验。</td>
+          </tr>
+          <tr>
+            <td><code>skills/research/prompts/synthesis.md</code></td>
+            <td>写证据绑定的研究报告和可复用知识。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>资料来源</h2>
+      <ul>
+        <li><a href="https://code.claude.com/docs/en/skills">Claude Code skills 文档</a></li>
+        <li><a href="https://github.com/openai/skills">OpenAI skills for Codex 仓库</a></li>
+        <li><a href="https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/features/skills.md">Hermes Agent skills 文档</a></li>
+        <li><a href="https://opencode.ai/docs/de/skills/">OpenCode skills 文档</a></li>
+        <li><a href="https://moonshotai.github.io/kimi-cli/en/customization/skills.html">Kimi Code CLI Agent Skills 文档</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>生成日期：2026-05-24。建议在新会话中测试 skill 发现，因为多数 agent 会在启动时缓存可用 skill 列表。</p>
+    </div>
+  </footer>
+</body>
+</html>
