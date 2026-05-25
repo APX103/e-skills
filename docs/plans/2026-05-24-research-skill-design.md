@@ -1,13 +1,13 @@
-# Research Skill Design
+# E-Research Skill Design
 
 ## Overview
 
-Add a `research` skill for long-running knowledge production tasks: thought experiments, computer science research, autonomous experiments, unfamiliar-system investigation, and evidence-backed reports.
+Add an `e-research` skill for long-running knowledge production tasks: thought experiments, computer science research, autonomous experiments, unfamiliar-system investigation, and evidence-backed reports.
 
 The skill complements the existing system instead of replacing it:
 
 - `brainstorming` clarifies the initial contract when the goal is vague.
-- `research` owns the research loop: charter -> investigation -> experiment -> evidence review -> synthesis.
+- `e-research` owns the research loop: charter -> investigation -> experiment -> evidence review -> synthesis.
 - `think` supplies analysis packs for unknowns, assumptions, evidence quality, failures, and next experiments.
 - `build` executes engineering-heavy experiments when code, environments, tests, or benchmarks are needed.
 
@@ -71,9 +71,9 @@ knowledge.md
 
 The skill should include:
 
-- `skills/research/SKILL.md`: concise routing and workflow guidance.
-- `skills/research/prompts/charter.md`: turns a broad ask into a research charter.
-- `skills/research/prompts/experiment.md`: designs minimal experiments.
-- `skills/research/prompts/synthesis.md`: produces evidence-backed reports.
+- `skills/e-research/SKILL.md`: concise routing and workflow guidance.
+- `skills/e-research/prompts/charter.md`: turns a broad ask into a research charter.
+- `skills/e-research/prompts/experiment.md`: designs minimal experiments.
+- `skills/e-research/prompts/synthesis.md`: produces evidence-backed reports.
 
 The `SKILL.md` should reference `think` and `build` instead of duplicating their detailed procedures.

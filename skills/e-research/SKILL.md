@@ -1,6 +1,11 @@
 ---
 name: e-research
 description: Use when asked to conduct long-running research, knowledge production, thought experiments, computer science research, autonomous experiments, evidence-backed investigations, or Chinese requests like 研究, 调研, 思维实验, 知识生产, or 计算机科学研究.
+version: 1.0.1
+metadata:
+  hermes:
+    category: research
+    tags: [research, knowledge-production, experiments, evidence]
 ---
 
 # Research

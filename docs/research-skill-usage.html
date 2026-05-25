@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Research Skill 使用指南</title>
+  <title>E-Research Skill 使用指南</title>
   <style>
     :root {
       color-scheme: light;
@@ -283,13 +283,13 @@
     <div class="wrap hero">
       <div>
         <p class="eyebrow">Agent Skills / Research Workflow</p>
-        <h1>Research Skill 使用指南</h1>
+        <h1>E-Research Skill 使用指南</h1>
         <p class="lead">这个 skill 用来让 agent 承接长任务知识生产：研究、调研、思维实验、计算机科学实验、证据驱动的报告。它不是替代 <code>brainstorming</code>，而是把后续的研究闭环接过去。</p>
         <div class="quick" aria-label="quick facts">
-          <div><strong>当前状态</strong><span>已安装到 <code>~/.claude/skills/research</code>，并已链接到 Codex 与 Hermes 目录。</span></div>
-          <div><strong>Claude Code</strong><span>可自动触发，也可用 <code>/research ...</code> 直接调用。</span></div>
+          <div><strong>当前状态</strong><span>已安装到 <code>~/.claude/skills/e-research</code>，并已链接到 Codex 与 Hermes 目录。</span></div>
+          <div><strong>Claude Code</strong><span>可自动触发，也可用 <code>/e-research ...</code> 直接调用。</span></div>
           <div><strong>Codex</strong><span>需要在新会话或重启后重新发现 skills；当前对话不会动态刷新。</span></div>
-          <div><strong>Hermes</strong><span>已链接到 <code>~/.hermes/skills/research</code>，可用 slash command。</span></div>
+          <div><strong>Hermes</strong><span>已链接到 <code>~/.hermes/skills/e-research</code>，可用 slash command。</span></div>
           <div><strong>OpenCode / Kimi</strong><span>两者都支持兼容路径，具体见下方附录。</span></div>
         </div>
       </div>
@@ -299,9 +299,9 @@
   <main class="wrap">
     <section>
       <h2>一句话答案</h2>
-      <p>是的，Codex 也可以用这个 skill，但需要它的运行环境能发现 <code>SKILL.md</code>。我已经把本机的 <code>research</code> skill 放在仓库里，并分别链接到了 Claude Code、Codex、Hermes 常用的用户级 skills 目录。</p>
+      <p>是的，Codex 也可以用这个 skill，但需要它的运行环境能发现 <code>SKILL.md</code>。我已经把本机的 <code>e-research</code> skill 放在仓库里，并分别链接到了 Claude Code、Codex、Hermes 常用的用户级 skills 目录。</p>
       <div class="note">
-        <p><strong>重要：</strong>本轮 Codex 会话启动时还没有 <code>research</code> 这个 skill，所以这轮对话的系统 skill 列表不会自动长出来。下次启动 Codex 或开启新会话时，它才有机会进入可发现列表。</p>
+        <p><strong>重要：</strong>本轮 Codex 会话启动时还没有 <code>e-research</code> 这个 skill，所以这轮对话的系统 skill 列表不会自动长出来。下次启动 Codex 或开启新会话时，它才有机会进入可发现列表。</p>
       </div>
     </section>
 
@@ -318,7 +318,7 @@
         <tbody>
           <tr>
             <td>开放式研究、调研、思维实验</td>
-            <td><code>research</code></td>
+            <td><code>e-research</code></td>
             <td>研究一下某种调度算法为什么在长上下文 agent 中更稳。</td>
           </tr>
           <tr>
@@ -357,16 +357,16 @@
         <div class="platform">
           <h3><span class="mark claude"></span>安装位置</h3>
           <p>个人级 skill 放在：</p>
-          <pre><code>~/.claude/skills/research/SKILL.md</code></pre>
+          <pre><code>~/.claude/skills/e-research/SKILL.md</code></pre>
           <p>这个仓库已经通过 symlink 安装到了这个位置：</p>
-          <pre><code>~/.claude/skills/research -> /Users/lijialun/work/engineer_skills/skills/research/</code></pre>
+          <pre><code>~/.claude/skills/e-research -> /Users/lijialun/work/engineer_skills/skills/e-research/</code></pre>
         </div>
         <div class="platform">
           <h3><span class="mark claude"></span>调用方式</h3>
           <p>自动触发：</p>
           <pre><code>帮我研究一下 agent 长任务知识生产怎样做证据闭环</code></pre>
           <p>显式触发：</p>
-          <pre><code>/research 研究一下多轮实验型 agent workflow，输出 charter、实验计划和报告</code></pre>
+          <pre><code>/e-research 研究一下多轮实验型 agent workflow，输出 charter、实验计划和报告</code></pre>
         </div>
       </div>
       <p class="small">Claude Code 文档说明：skill 是包含 <code>SKILL.md</code> 的目录；可自动相关触发，也可用 <code>/skill-name</code> 直接调用；个人级路径是 <code>~/.claude/skills/&lt;skill-name&gt;/SKILL.md</code>。</p>
@@ -378,17 +378,17 @@
         <div class="platform">
           <h3><span class="mark codex"></span>安装位置</h3>
           <p>本机已额外链接到 Codex 用户级 skills 目录：</p>
-          <pre><code>~/.codex/skills/research -> /Users/lijialun/work/engineer_skills/skills/research</code></pre>
+          <pre><code>~/.codex/skills/e-research -> /Users/lijialun/work/engineer_skills/skills/e-research</code></pre>
           <p>如果你在另一台机器上使用，可以手动复制或链接：</p>
           <pre><code>mkdir -p ~/.codex/skills
-ln -s /path/to/engineer_skills/skills/research ~/.codex/skills/research</code></pre>
+ln -s /path/to/engineer_skills/skills/e-research ~/.codex/skills/e-research</code></pre>
         </div>
         <div class="platform">
           <h3><span class="mark codex"></span>调用方式</h3>
           <p>推荐自然语言触发，让 Codex 根据 description 决定是否加载：</p>
-          <pre><code>用 research skill 研究一下 X，先写 research charter，再做实验设计</code></pre>
+          <pre><code>用 e-research skill 研究一下 X，先写 research charter，再做实验设计</code></pre>
           <p>如果 Codex 没有自动加载，直接点名：</p>
-          <pre><code>请使用 research skill：研究 X，并把证据、实验、结论分开记录</code></pre>
+          <pre><code>请使用 e-research skill：研究 X，并把证据、实验、结论分开记录</code></pre>
         </div>
       </div>
       <div class="note warn">
@@ -403,21 +403,31 @@ ln -s /path/to/engineer_skills/skills/research ~/.codex/skills/research</code></
         <div class="platform">
           <h3><span class="mark hermes"></span>安装位置</h3>
           <p>Hermes 的主 skills 目录是：</p>
-          <pre><code>~/.hermes/skills/research/SKILL.md</code></pre>
-          <p>本机已经链接到这个位置：</p>
-          <pre><code>~/.hermes/skills/research -> /Users/lijialun/work/engineer_skills/skills/research</code></pre>
+          <pre><code>~/.hermes/skills/e-research/SKILL.md</code></pre>
+          <p>如果 Hermes 已经 clone 了这个仓库，直接在仓库根目录运行：</p>
+          <pre><code>./install.sh update</code></pre>
+          <p>这会创建或更新这个链接：</p>
+          <pre><code>~/.hermes/skills/e-research -> /Users/lijialun/work/engineer_skills/skills/e-research</code></pre>
         </div>
         <div class="platform">
           <h3><span class="mark hermes"></span>调用方式</h3>
           <p>Hermes 会把已安装 skill 暴露成 slash command，所以可以直接调用：</p>
-          <pre><code>/research 研究一下 X，先写 Research Charter，再做实验和证据复盘</code></pre>
+          <pre><code>/e-research 研究一下 X，先写 Research Charter，再做实验和证据复盘</code></pre>
           <p>也可以自然语言触发：</p>
-          <pre><code>请用 research skill 做一个证据驱动的调研：X。</code></pre>
+          <pre><code>请用 e-research skill 做一个证据驱动的调研：X。</code></pre>
         </div>
       </div>
       <div class="note">
         <p><strong>Hermes 很适合这个：</strong>它的 skills 系统本身就是渐进加载的 procedural memory，还支持外部 skill 目录。长任务研究时，建议让 Hermes 把产物写到 <code>.agent-log/&lt;timestamp&gt;-research/</code> 或你指定的项目目录。</p>
       </div>
+      <h3>Hermes 直接从 GitHub 安装</h3>
+      <p>不想 clone 整个仓库时，可以用 Hermes 的单 skill 安装路径：</p>
+      <pre><code>hermes skills install APX103/e-skills/skills/e-research</code></pre>
+      <p>如果先把这个仓库作为 tap 加进去，默认 tap path 是 <code>skills/</code>，然后安装 skill 名：</p>
+      <pre><code>hermes skills tap add APX103/e-skills
+hermes skills install APX103/e-skills/e-research</code></pre>
+      <p>给 Hermes 自己读的逐步安装和排障文档在仓库里：</p>
+      <pre><code>docs/hermes-e-research-install.md</code></pre>
       <p class="small">Hermes 官方仓库文档说明：skills 默认生活在 <code>~/.hermes/skills/</code>，每个已安装 skill 会自动成为 slash command，也可以通过自然语言加载；还可配置 external skill directories。</p>
     </section>
 
@@ -427,19 +437,19 @@ ln -s /path/to/engineer_skills/skills/research ~/.codex/skills/research</code></
         <div class="platform">
           <h3><span class="mark opencode"></span>兼容路径</h3>
           <p>OpenCode 官方文档列出的路径包括：</p>
-          <pre><code>.opencode/skills/research/SKILL.md
-~/.config/opencode/skills/research/SKILL.md
-.claude/skills/research/SKILL.md
-~/.claude/skills/research/SKILL.md
-.agents/skills/research/SKILL.md
-~/.agents/skills/research/SKILL.md</code></pre>
+          <pre><code>.opencode/skills/e-research/SKILL.md
+~/.config/opencode/skills/e-research/SKILL.md
+.claude/skills/e-research/SKILL.md
+~/.claude/skills/e-research/SKILL.md
+.agents/skills/e-research/SKILL.md
+~/.agents/skills/e-research/SKILL.md</code></pre>
         </div>
         <div class="platform">
           <h3><span class="mark opencode"></span>本机建议</h3>
-          <p>因为本机已经有 <code>~/.claude/skills/research</code>，OpenCode 理论上可以从 Claude-compatible 全局路径发现它。</p>
+          <p>因为本机已经有 <code>~/.claude/skills/e-research</code>，OpenCode 理论上可以从 Claude-compatible 全局路径发现它。</p>
           <pre><code>opencode
 # 然后说：
-Use the research skill to investigate X.</code></pre>
+Use the e-research skill to investigate X.</code></pre>
         </div>
       </div>
     </section>
@@ -459,10 +469,10 @@ Use the research skill to investigate X.</code></pre>
         </div>
         <div class="platform">
           <h3><span class="mark kimi"></span>本机状态</h3>
-          <p>本机没有发现 <code>kimi</code> 或 <code>kimi-cli</code> 命令，但如果之后安装 Kimi Code CLI，它应该能从 <code>~/.claude/skills/research</code> 或 <code>~/.codex/skills/research</code> 发现这个 skill。</p>
+          <p>本机没有发现 <code>kimi</code> 或 <code>kimi-cli</code> 命令，但如果之后安装 Kimi Code CLI，它应该能从 <code>~/.claude/skills/e-research</code> 或 <code>~/.codex/skills/e-research</code> 发现这个 skill。</p>
           <pre><code>kimi
 # 或 kimi-cli，取决于你的安装方式
-请使用 research skill 研究 X。</code></pre>
+请使用 e-research skill 研究 X。</code></pre>
         </div>
       </div>
     </section>
@@ -470,14 +480,14 @@ Use the research skill to investigate X.</code></pre>
     <section>
       <h2>推荐说法</h2>
       <p>如果你想让 agent 用这个 skill，不要只说“想想 X”。更稳的 prompt 是把产物和边界也说出来：</p>
-      <pre><code>请使用 research skill 研究「X」。
+      <pre><code>请使用 e-research skill 研究「X」。
 要求：
 1. 先写 Research Charter：问题、假设、证据标准、停止条件。
 2. 如果需要实验，设计最小实验，只改变一个关键变量。
 3. 把事实、假设、解释、未知分开。
 4. 最后输出 report.md 和 knowledge.md。</code></pre>
       <p>如果是计算机科学研究，可以更具体：</p>
-      <pre><code>请使用 research skill 做一个小型 CS 研究：
+      <pre><code>请使用 e-research skill 做一个小型 CS 研究：
 比较两种算法在数据集 Y 上的表现。
 允许自己搭环境、写 benchmark、跑实验。
 每轮实验后检查 evidence-strength，再决定是否继续。</code></pre>
@@ -494,19 +504,19 @@ Use the research skill to investigate X.</code></pre>
         </thead>
         <tbody>
           <tr>
-            <td><code>skills/research/SKILL.md</code></td>
+            <td><code>skills/e-research/SKILL.md</code></td>
             <td>平台发现和主流程说明。</td>
           </tr>
           <tr>
-            <td><code>skills/research/prompts/charter.md</code></td>
+            <td><code>skills/e-research/prompts/charter.md</code></td>
             <td>把开放式问题变成 Research Charter。</td>
           </tr>
           <tr>
-            <td><code>skills/research/prompts/experiment.md</code></td>
+            <td><code>skills/e-research/prompts/experiment.md</code></td>
             <td>设计最小可验证实验。</td>
           </tr>
           <tr>
-            <td><code>skills/research/prompts/synthesis.md</code></td>
+            <td><code>skills/e-research/prompts/synthesis.md</code></td>
             <td>写证据绑定的研究报告和可复用知识。</td>
           </tr>
         </tbody>
