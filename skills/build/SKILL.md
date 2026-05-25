@@ -197,7 +197,7 @@ INNER LOOP (fix rounds within one iteration):
 
 Runs after the iteration loop completes (success or max iterations reached).
 
-1. Dispatch subagent (`general-purpose`) with `./prompts/extract-knowledge.md` filled: `{state_dir}`, `{knowledge_dir}` = `$HOME/.claude/build-knowledge`. Then dispatch subagent with `./prompts/extract-metrics.md` filled: `{state_dir}`, `{knowledge_dir}`, `{skill_dir}` = `/Users/lijialun/work/engineer_skills/skills/build/`.
+1. Dispatch subagent (`general-purpose`) with `./prompts/extract-knowledge.md` filled: `{state_dir}`, `{knowledge_dir}` = `$HOME/.claude/build-knowledge`. Then dispatch subagent with `./prompts/extract-metrics.md` filled: `{state_dir}`, `{knowledge_dir}`, `{skill_dir}` (the directory containing this skill's prompts, typically resolved from the skill installation path).
 2. After extraction, check if any knowledge file exceeds ~200 lines; if so, dispatch compaction subagent with `./prompts/compact-knowledge.md`: `{knowledge_dir}`.
 
 ## Phase 7: Prompt Evolution (Self-Improvement)
@@ -206,7 +206,7 @@ Runs after Phase 6 if the knowledge store has 3+ sessions with metrics.
 
 1. Check skip conditions: skip if project type is `skill-modification`, if fewer than 3 total sessions in aggregate metrics, or if knowledge files are empty/missing.
    - **Dry-run mode**: If `--dry-run` is set, Phase 7 runs in read-only mode. The evolution report is still generated (proposals, validations, and bloat warnings are computed), but no prompt files are modified, no version backups are created, and the changelog is not updated. The report will be marked as "DRY RUN".
-2. Dispatch subagent (`general-purpose`) with `./prompts/evolve-prompts.md` filled: `{skill_dir}` = `/Users/lijialun/work/engineer_skills/skills/build/`, `{knowledge_dir}` = `$HOME/.claude/build-knowledge`, `{state_dir}`, `{project_type}` (from session.md), `{dry_run}` = `"true"` or `"false"` (from `--dry-run` flag).
+2. Dispatch subagent (`general-purpose`) with `./prompts/evolve-prompts.md` filled: `{skill_dir}` (the directory containing this skill's prompts, typically resolved from the skill installation path), `{knowledge_dir}` = `$HOME/.claude/build-knowledge`, `{state_dir}`, `{project_type}` (from session.md), `{dry_run}` = `"true"` or `"false"` (from `--dry-run` flag).
 3. The evolution agent will:
    - Analyze knowledge entries for each of the 5 core prompts
    - Generate proposals based on multi-session patterns
@@ -268,5 +268,5 @@ Print: iterations, remaining issues, log path. Include count of learnings extrac
 To revert a prompt template to a previous version:
 1. List versions: `ls $HOME/.claude/build-knowledge/prompt-versions/`
 2. Read the version metadata comment at the top of the desired `.v{N}` file
-3. Copy the version file over the live prompt: `cp {version-file} /Users/lijialun/work/engineer_skills/skills/build/prompts/{filename}`
+3. Copy the version file over the live prompt: `cp {version-file} {skill_dir}/prompts/{filename}` (where `{skill_dir}` is the directory containing this skill's prompts).
 4. The next evolution cycle will detect the manual change (the file will differ from the latest version backup) and skip auto-evolution for that prompt. To resume auto-evolution, apply the versioned backup over the live prompt, then the next evolution cycle will detect them as identical and proceed normally.
