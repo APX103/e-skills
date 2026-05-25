@@ -14,7 +14,7 @@ You are the prompt evolution agent. Your job is to analyze accumulated knowledge
 
 ## Context
 
-The build skill follows a loop: understand -> plan -> execute -> verify -> fix (iterate). After each session, Phase 6 extracts learnings into a knowledge store at `{knowledge_dir}/knowledge/`. Structured session metrics are written to `{knowledge_dir}/metrics/`.
+The e-build skill follows a loop: understand -> plan -> execute -> verify -> fix (iterate). After each session, Phase 6 extracts learnings into a knowledge store at `{knowledge_dir}/knowledge/`. Structured session metrics are written to `{knowledge_dir}/metrics/`.
 
 Your job is to close the feedback loop: read what past sessions learned, determine which insights are strong enough to bake into the prompt templates themselves, and apply those changes with full versioning and validation.
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-`/build` — a self-driving, fully-automated, observable execution skill for Claude Code.
+`/e-build` — a self-driving, fully-automated, observable execution skill for Claude Code.
 Single entry point. Agent autonomously executes the full cycle: understand → plan → execute → verify → iterate.
 Process fully logged to `.agent-log/` for human review.
 
@@ -16,7 +16,7 @@ Process fully logged to `.agent-log/` for human review.
 ## Invocation
 
 ```
-/build "<task description>" [--iterations N] [--verification "method1,method2"]
+/e-build "<task description>" [--iterations N] [--verification "method1,method2"]
 ```
 
 Parameters:
@@ -36,7 +36,7 @@ All state lives in files, NOT in conversation context. This is critical because:
 State files:
 ```
 .agent-log/
-  <timestamp>-build/
+  <timestamp>-e-build/
     session.md          # Master log: head=goal, tail=progress, middle=steps
     understanding.md    # Phase 1 output: what the agent understood
     plan.md             # Phase 2 output: task breakdown
@@ -217,7 +217,7 @@ These are the default strategies, NOT asked of the human each time:
 - **Verification agents**: One per verification method. Use `general-purpose` type.
 
 ### File-Based State Protocol
-- Every subagent receives a `state_dir` parameter pointing to the `.agent-log/<timestamp>-build/` directory
+- Every subagent receives a `state_dir` parameter pointing to the `.agent-log/<timestamp>-e-build/` directory
 - Subagents READ state from files, WRITE results to files
 - Subagents do NOT pass state back through conversation — only through files
 - This makes subagents fully isolated and restartable
@@ -252,6 +252,6 @@ These are the default strategies, NOT asked of the human each time:
 
 - `/verify` as a standalone skill (extract Phase 4)
 - `/understand` as a standalone skill (extract Phase 1)
-- Integration with CI/CD (e.g., trigger `/build` on PR)
+- Integration with CI/CD (e.g., trigger `/e-build` on PR)
 - Historical learning: reuse understanding from previous similar tasks
 - Custom verification plugins

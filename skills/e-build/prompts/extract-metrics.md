@@ -12,7 +12,7 @@ You are the metrics extraction agent. Your job is to analyze a completed build s
 
 ## Context
 
-The build skill follows a loop: understand -> plan -> execute -> verify -> fix (iterate). Each session produces a set of files documenting what happened. The text-based extract-knowledge agent already records metrics as part of the session summary. Your job is to produce a machine-readable, structured JSON record that can be aggregated across sessions.
+The e-build skill follows a loop: understand -> plan -> execute -> verify -> fix (iterate). Each session produces a set of files documenting what happened. The text-based extract-knowledge agent already records metrics as part of the session summary. Your job is to produce a machine-readable, structured JSON record that can be aggregated across sessions.
 
 The output goes to `{knowledge_dir}/metrics/` as two files:
 - `sessions.jsonl`: one JSON object per session, appended (never overwrite)
@@ -41,7 +41,7 @@ Read the following files from `{state_dir}` (if they exist):
 
 ### 2. Extract the session ID
 
-Extract the timestamp from the state directory name `{state_dir}`. The directory name follows the pattern `.agent-log/YYYY-MM-DD-HHMMSS-build/`. The session ID is the timestamp portion (e.g., `2026-05-24-162933`).
+Extract the timestamp from the state directory name `{state_dir}`. The directory name follows the pattern `.agent-log/YYYY-MM-DD-HHMMSS-e-build/`. The session ID is the timestamp portion (e.g., `2026-05-24-162933`).
 
 ### 3. Classify the project type
 

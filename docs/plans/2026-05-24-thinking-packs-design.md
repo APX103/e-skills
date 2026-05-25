@@ -2,13 +2,13 @@
 
 ## Overview
 
-将"Agent 思维包"系统整合到 engineer_skills 项目中，为 build 循环提供深度分析和实践闭环能力。采用**独立 /think skill + build 集成钩子**的方案。
+将"Agent 思维包"系统整合到 engineer_skills 项目中，为 build 循环提供深度分析和实践闭环能力。采用**独立 /e-think skill + build 集成钩子**的方案。
 
 ## Architecture
 
 ```
 skills/
-  think/                         # 独立 /think skill
+  think/                         # 独立 /e-think skill
     SKILL.md                     # skill 定义 + 触发规则 + 闭环流程
     prompts/
       template.md                # 通用思维包模板
@@ -20,21 +20,21 @@ skills/
   build/
     SKILL.md                     # 在 Phase 4/5 间增加 think 钩子
     prompts/
-      think-hook-verify.md       # 验证后调用思维包的路由逻辑
-      think-hook-iterate.md      # 迭代前调用思维包的路由逻辑
+      e-think-hook-verify.md       # 验证后调用思维包的路由逻辑
+      e-think-hook-iterate.md      # 迭代前调用思维包的路由逻辑
 shared/
   thinking-frameworks.md         # 6 个思想工具的摘要引用
 ```
 
-## 1. /think Skill
+## 1. /e-think Skill
 
 ### 触发规则
 
-- `/think` — 完整闭环模式，根据上下文自动选择入口
-- `/think success` — 直接调用"真成了吗包"
-- `/think failure` — 直接调用"真没成吗包"
-- `/think cause` — 直接调用"根因分析包"
-- `/think reflect` — 读取 .agent-log/ 最近状态，自动判断入口
+- `/e-think` — 完整闭环模式，根据上下文自动选择入口
+- `/e-think success` — 直接调用"真成了吗包"
+- `/e-think failure` — 直接调用"真没成吗包"
+- `/e-think cause` — 直接调用"根因分析包"
+- `/e-think reflect` — 读取 .agent-log/ 最近状态，自动判断入口
 
 ### 闭环流程
 

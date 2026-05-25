@@ -1,25 +1,25 @@
 ---
-name: think
+name: e-think
 description: Use when reflecting on results, analyzing success or failure, finding root causes, prioritizing problems, or planning next experiments. Triggers on "think", "reflect", "analyze", "root cause", "why did it fail", "why did it work", "what went wrong", "what should we do next", "investigate", "reproduce", "what are the risks", "red team", "second order effects", "assumptions", "evidence quality", or any task requiring structured analysis of outcomes.
 ---
 
-# /think
+# /e-think
 
 Structured analysis: investigate → judge → attribute → prioritize → design next action. File-based state, pack-chaining via JSON, full logging.
 
 ## Invocation
 
 ```
-/think "<context>" [--pack <name>] [--from-build]
+/e-think "<context>" [--pack <name>] [--from-e-build]
 ```
 
 - `<context>`: What to analyze. May include goals, results, observations.
 - `--pack <name>`: Skip auto-routing, directly invoke a specific pack. Options: `verify-success`, `verify-failure`, `root-cause`, `main-contradiction`, `next-experiment`, `reproduce`, `red-team`, `second-order-effects`, `investigation`, `evidence-strength`, `assumption-surfacing`.
-- `--from-build`: Indicates this was auto-triggered by the build skill. Read state from the build session directory.
+- `--from-e-build`: Indicates this was auto-triggered by the e-build skill. Read state from the e-build session directory.
 
 ## Architecture
 
-All state in files under `.agent-log/<timestamp>-think/`:
+All state in files under `.agent-log/<timestamp>-e-think/`:
 
 ```
 session.md                  # Master log: context, pack chain, decisions
@@ -118,9 +118,9 @@ digraph { rankdir=TB; node[shape=box];
 
 ## Phase 0: Routing
 
-1. Parse args. Create `.agent-log/<YYYY-MM-DD-HHMMSS>-think/`.
+1. Parse args. Create `.agent-log/<YYYY-MM-DD-HHMMSS>-e-think/`.
 2. Init `session.md` with context from `<context>` arg.
-3. If `--from-build`: read the build session's `session.md`, `verify-report.md`, `understanding.md`, and `plan.md` to populate context.
+3. If `--from-e-build`: read the e-build session's `session.md`, `verify-report.md`, `understanding.md`, and `plan.md` to populate context.
 4. If `--pack` specified: skip auto-routing, go directly to that pack.
 5. If no `--pack`: auto-determine entry point:
    - If user describes a success → route to `verify-success`.
@@ -141,7 +141,7 @@ digraph { rankdir=TB; node[shape=box];
 
 For the selected pack (and each subsequent pack in the chain):
 
-1. Dispatch subagent (`general-purpose`) with the corresponding prompt file: `skills/think/prompts/<pack-name>.md`.
+1. Dispatch subagent (`general-purpose`) with the corresponding prompt file: `skills/e-think/prompts/<pack-name>.md`.
 2. Fill placeholders in the prompt:
    - `{state_dir}`: the thinking session directory
    - `{upstream_json}`: if a previous pack ran, read its JSON output file
@@ -174,11 +174,11 @@ For the selected pack (and each subsequent pack in the chain):
    - Evidence strength
    - Recommended next action
    - State directory path for full details
-3. If `--from-build`: append a recommendation back to the build session's `session.md` indicating what the build skill should do next (continue fixing, narrow scope, or proceed to knowledge extraction).
+3. If `--from-e-build`: append a recommendation back to the e-build session's `session.md` indicating what the e-build skill should do next (continue fixing, narrow scope, or proceed to knowledge extraction).
 
 ## Build Integration Protocol
 
-When called with `--from-build`, the think skill reads from and writes to the build session:
+When called with `--from-e-build`, the e-think skill reads from and writes to the e-build session:
 
 **Input from build:**
 - `{build_state_dir}/session.md` — goal, iteration history
@@ -188,7 +188,7 @@ When called with `--from-build`, the think skill reads from and writes to the bu
 
 **Output to build (appended to `{build_state_dir}/session.md`):**
 ```
-## Think Analysis <timestamp>
+## E-Think Analysis <timestamp>
 **Entry pack**: [which pack was triggered]
 **Chain**: [pack1] → [pack2] → ... → [packN]
 **Conclusion**: [final conclusion]

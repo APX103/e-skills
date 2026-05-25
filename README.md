@@ -4,8 +4,8 @@
 
 这个仓库目前包含三类核心能力：
 
-- `build`: 面向工程实现的自驱闭环，覆盖理解、计划、执行、验证、修复和知识提取。
-- `think`: 面向结果复盘和结构化分析的思维包系统，覆盖成功/失败判断、根因、主要矛盾、证据强度、下一轮实验等。
+- `e-build`: 面向工程实现的自驱闭环，覆盖理解、计划、执行、验证、修复和知识提取。
+- `e-think`: 面向结果复盘和结构化分析的思维包系统，覆盖成功/失败判断、根因、主要矛盾、证据强度、下一轮实验等。
 - `e-research`: 面向长任务知识生产的研究闭环，覆盖 research charter、调查、实验、证据复盘和综合报告。
 
 这些 skills 的目标不是让 Agent “多想一点”，而是让 Agent 在长任务中有稳定的状态文件、明确的证据标准、可复现的实验路径和可沉淀的经验。
@@ -57,10 +57,10 @@ cd e-skills
 ├── shared/
 │   └── thinking-frameworks.md
 ├── skills/
-│   ├── build/
+│   ├── e-build/
 │   │   ├── SKILL.md
 │   │   └── prompts/
-│   ├── think/
+│   ├── e-think/
 │   │   ├── SKILL.md
 │   │   └── prompts/
 │   └── e-research/
@@ -77,8 +77,8 @@ cd e-skills
 | 路径 | 作用 |
 |---|---|
 | `install.sh` | 将仓库 skills 链接到 Claude Code、Codex、Hermes 和通用 Agent skill 目录 |
-| `skills/build/SKILL.md` | 工程实现闭环的主说明 |
-| `skills/think/SKILL.md` | 结构化思考和复盘系统的主说明 |
+| `skills/e-build/SKILL.md` | 工程实现闭环的主说明 |
+| `skills/e-think/SKILL.md` | 结构化思考和复盘系统的主说明 |
 | `skills/e-research/SKILL.md` | 长任务研究和知识生产闭环的主说明 |
 | `shared/thinking-frameworks.md` | 多个 thinking packs 共用的思想框架摘要 |
 | `docs/hermes-e-research-install.md` | 给 Hermes Agent 自己读取的安装和排障指南 |
@@ -86,9 +86,9 @@ cd e-skills
 
 ## 核心 Skills
 
-### build
+### e-build
 
-`build` 用于工程实现类任务，例如：
+`e-build` 用于工程实现类任务，例如：
 
 - 新建项目
 - 复刻已有项目或页面
@@ -99,7 +99,7 @@ cd e-skills
 调用示例：
 
 ```text
-/build "实现一个日志分析 CLI，支持读取 JSONL、聚合错误类型并输出报告" --iterations 2 --verification "automated-testing,code-review"
+/e-build "实现一个日志分析 CLI，支持读取 JSONL、聚合错误类型并输出报告" --iterations 2 --verification "automated-testing,code-review"
 ```
 
 核心流程：
@@ -110,14 +110,14 @@ Understand -> Plan -> Execute -> Verify -> Think -> Fix -> Extract Knowledge -> 
 
 特点：
 
-- 以 `.agent-log/<timestamp>-build/` 保存过程状态。
+- 以 `.agent-log/<timestamp>-e-build/` 保存过程状态。
 - 每个阶段通过文件传递上下文，减少长任务上下文压缩带来的信息丢失。
-- 验证后接入 `think`，先判断成功/失败是否真实，再决定修复、缩小范围、重验或继续。
-- 会将跨会话经验沉淀到 `$HOME/.claude/build-knowledge/`。
+- 验证后接入 `e-think`，先判断成功/失败是否真实，再决定修复、缩小范围、重验或继续。
+- 会将跨会话经验沉淀到 `$HOME/.claude/e-build-knowledge/`。
 
-### think
+### e-think
 
-`think` 用于结构化分析，不直接承担工程实现。它适合在以下场景使用：
+`e-think` 用于结构化分析，不直接承担工程实现。它适合在以下场景使用：
 
 - 结果看起来成功，但需要确认是否真成功。
 - 结果失败，需要判断是真失败、假失败还是证据不足。
@@ -127,7 +127,7 @@ Understand -> Plan -> Execute -> Verify -> Think -> Fix -> Extract Knowledge -> 
 调用示例：
 
 ```text
-/think "这个 benchmark 结果显示方案 A 快 20%，但样本只有 3 次，证据够吗？" --pack evidence-strength
+/e-think "这个 benchmark 结果显示方案 A 快 20%，但样本只有 3 次，证据够吗？" --pack evidence-strength
 ```
 
 内置 packs：
@@ -178,8 +178,8 @@ Research Charter -> Investigation -> Experiment -> Evidence Review -> Synthesis
 特点：
 
 - `brainstorming` 只用于入口澄清，不负责整个研究流程。
-- 小实验可以直接执行，工程复杂实验可以交给 `build`。
-- 实验后用 `think` 判断成功/失败、证据强度、复现性和下一步。
+- 小实验可以直接执行，工程复杂实验可以交给 `e-build`。
+- 实验后用 `e-think` 判断成功/失败、证据强度、复现性和下一步。
 - 输出应区分事实、假设、解释、未知和可复用知识。
 
 ## 安装方式
@@ -202,8 +202,8 @@ Research Charter -> Investigation -> Experiment -> Evidence Review -> Synthesis
 当前会安装：
 
 ```text
-build
-think
+e-build
+e-think
 e-research
 ```
 
@@ -236,8 +236,8 @@ symlink 的好处是：
 安装后可直接调用：
 
 ```text
-/build "实现 X"
-/think "分析 Y 为什么失败" --pack root-cause
+/e-build "实现 X"
+/e-think "分析 Y 为什么失败" --pack root-cause
 /e-research 研究 Z
 ```
 
@@ -333,7 +333,7 @@ Kimi Code CLI 文档显示会扫描多个用户级 skill 目录，包括：
 ### 工程实现
 
 ```text
-/build "给现有项目增加 CSV 导入功能，要求有测试和错误处理" --iterations 2
+/e-build "给现有项目增加 CSV 导入功能，要求有测试和错误处理" --iterations 2
 ```
 
 适合目标明确、需要改代码、需要验证的任务。
@@ -341,7 +341,7 @@ Kimi Code CLI 文档显示会扫描多个用户级 skill 目录，包括：
 ### 失败复盘
 
 ```text
-/think "测试通过但用户反馈功能仍不可用，帮我判断是假成功还是验证不足" --pack evidence-strength
+/e-think "测试通过但用户反馈功能仍不可用，帮我判断是假成功还是验证不足" --pack evidence-strength
 ```
 
 适合判断证据质量、复现问题、定位根因。
@@ -354,9 +354,9 @@ Kimi Code CLI 文档显示会扫描多个用户级 skill 目录，包括：
 
 适合开放式问题、实验探索和知识生产。
 
-### build 与 think 联动
+### e-build 与 e-think 联动
 
-`build` 在验证后会触发 `think` 分析：
+`e-build` 在验证后会触发 `e-think` 分析：
 
 ```text
 Verify -> Think -> Fix or Proceed
@@ -364,12 +364,12 @@ Verify -> Think -> Fix or Proceed
 
 这能减少“测试过了就宣称完成”的假成功。
 
-### e-research 与 build 联动
+### e-research 与 e-build 联动
 
-`e-research` 遇到需要实现、benchmark、模拟或环境搭建的实验时，可以把执行交给 `build`：
+`e-research` 遇到需要实现、benchmark、模拟或环境搭建的实验时，可以把执行交给 `e-build`：
 
 ```text
-Research Charter -> Experiment Design -> build executes experiment -> think reviews evidence -> Synthesis
+Research Charter -> Experiment Design -> e-build executes experiment -> e-think reviews evidence -> Synthesis
 ```
 
 ## 状态与知识沉淀
@@ -379,19 +379,19 @@ Research Charter -> Experiment Design -> build executes experiment -> think revi
 长任务状态默认写入 `.agent-log/`：
 
 ```text
-.agent-log/<timestamp>-build/
-.agent-log/<timestamp>-think/
+.agent-log/<timestamp>-e-build/
+.agent-log/<timestamp>-e-think/
 .agent-log/<timestamp>-research/
 ```
 
 `.agent-log/` 已被 `.gitignore` 忽略，不会进入版本库。
 
-### build 跨会话知识
+### e-build 跨会话知识
 
-`build` 会把经验沉淀到：
+`e-build` 会把经验沉淀到：
 
 ```text
-$HOME/.claude/build-knowledge/
+$HOME/.claude/e-build-knowledge/
 ```
 
 主要包括：
@@ -402,7 +402,7 @@ metrics/
 prompt-versions/
 ```
 
-当积累足够多会话后，`build` 可以用这些经验做 prompt evolution。
+当积累足够多会话后，`e-build` 可以用这些经验做 prompt evolution。
 
 ### research 输出建议
 

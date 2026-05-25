@@ -26,27 +26,31 @@ case "$ACTION" in
         ;;
 esac
 
-cleanup_legacy_research_symlink() {
+cleanup_legacy_skill_symlinks() {
     local target_dir="$1"
-    local legacy="$target_dir/research"
+    local legacy_name
 
-    [ -L "$legacy" ] || return 0
+    for legacy_name in build think research; do
+        local legacy="$target_dir/$legacy_name"
 
-    local link_target
-    link_target="$(readlink "$legacy")"
-    case "$link_target" in
-        "$SKILLS_DIR"/skills/research|"$SKILLS_DIR"/skills/research/)
-            rm "$legacy"
-            echo "  research: removed stale symlink from $(basename "$(dirname "$target_dir")")"
-            ;;
-    esac
+        [ -L "$legacy" ] || continue
+
+        local link_target
+        link_target="$(readlink "$legacy")"
+        case "$link_target" in
+            "$SKILLS_DIR"/skills/"$legacy_name"|"$SKILLS_DIR"/skills/"$legacy_name"/)
+                rm "$legacy"
+                echo "  $legacy_name: removed stale symlink from $(basename "$(dirname "$target_dir")")"
+                ;;
+        esac
+    done
 }
 
 for target_dir in "${TARGET_DIRS[@]}"; do
     mkdir -p "$target_dir"
     echo ""
     echo "Target: $target_dir"
-    cleanup_legacy_research_symlink "$target_dir"
+    cleanup_legacy_skill_symlinks "$target_dir"
 
     for skill_dir in "$SKILLS_DIR"/skills/*/; do
         [ -d "$skill_dir" ] || continue

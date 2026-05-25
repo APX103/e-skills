@@ -1,16 +1,16 @@
 ---
-name: build
+name: e-build
 description: Use when starting a greenfield implementation, replicating an existing project, refactoring a module, or improving an existing codebase. Triggers on "build", "implement", "create project", "replicate", "engineer", or any task requiring multi-step code execution with verification.
 ---
 
-# /build
+# /e-build
 
 Self-driving loop: understand -> plan -> execute -> verify -> iterate. File-based state, subagent isolation, full logging. Human interacts only at Phase 0.
 
 ## Invocation
 
 ```
-/build "<task>" [--iterations N] [--verification "method1,method2"] [--dry-run]
+/e-build "<task>" [--iterations N] [--verification "method1,method2"] [--dry-run]
 ```
 
 - `<task>`: What to build. May include file paths, URLs, or references.
@@ -20,30 +20,30 @@ Self-driving loop: understand -> plan -> execute -> verify -> iterate. File-base
 
 ## Architecture
 
-All state in files under `.agent-log/<timestamp>-build/`:
+All state in files under `.agent-log/<timestamp>-e-build/`:
 
 ```
 session.md           # Master log: head=goal, tail=progress
 understanding.md     # Phase 1 output
 plan.md              # Phase 2 output
 verify-report.md     # Phase 4 output
-think-verify-success.md   # Phase 4.5 verify-success analysis
-think-verify-success.json
-think-verify-failure.md   # Phase 4.5 verify-failure analysis
-think-verify-failure.json
-think-recommendation.md   # Phase 4.5 recommendation
-think-root-cause.md       # Deep analysis (if triggered)
-think-root-cause.json
-think-main-contradiction.md
-think-main-contradiction.json
-think-iterate-recommendation.md  # Post-fix recommendation
+e-think-verify-success.md   # Phase 4.5 verify-success analysis
+e-think-verify-success.json
+e-think-verify-failure.md   # Phase 4.5 verify-failure analysis
+e-think-verify-failure.json
+e-think-recommendation.md   # Phase 4.5 recommendation
+e-think-root-cause.md       # Deep analysis (if triggered)
+e-think-root-cause.json
+e-think-main-contradiction.md
+e-think-main-contradiction.json
+e-think-iterate-recommendation.md  # Post-fix recommendation
 iteration-N/         # Per-iteration details
 ```
 
-Persistent cross-session knowledge at `$HOME/.claude/build-knowledge/`:
+Persistent cross-session knowledge at `$HOME/.claude/e-build-knowledge/`:
 
 ```
-$HOME/.claude/build-knowledge/
+$HOME/.claude/e-build-knowledge/
   knowledge/
     understanding.md   # Learnings for the understand phase
     planning.md        # Learnings for the plan phase
@@ -90,17 +90,17 @@ digraph { rankdir=TB; node[shape=box];
 
 ## Phase 0: Contract Confirmation (Human Gate)
 
-1. Parse args. Create `.agent-log/<YYYY-MM-DD-HHMMSS>-build/`.
+1. Parse args. Create `.agent-log/<YYYY-MM-DD-HHMMSS>-e-build/`.
 2. Init `session.md` with Goal.
 3. If `--verification` omitted: analyze project, ask human to select methods.
-4. Detect `$HOME/.claude/build-knowledge/` knowledge store. Classify project type as `language/framework-archetype` (e.g., `python-cli`, `react-spa`, `go-api`, `skill-modification`). Write the classification to `session.md` as `## Project Type: [type]`.
+4. Detect `$HOME/.claude/e-build-knowledge/` knowledge store. Classify project type as `language/framework-archetype` (e.g., `python-cli`, `react-spa`, `go-api`, `skill-modification`). Write the classification to `session.md` as `## Project Type: [type]`.
 5. Write Verification Plan to `session.md`. Proceed to Phase 1.
 
 ## Phase 1: Deep Understanding
 
 Dispatch subagent (`general-purpose`) with `./prompts/understand.md` filled: `{state_dir}`, `{references}`, `{relevant_knowledge}`.
 
-Fill `{relevant_knowledge}` (mapped to `knowledge/understanding.md`): read `$HOME/.claude/build-knowledge/knowledge/understanding.md`, filter by project type tag, include top entries (~1500 tokens max). If file missing, empty, or malformed, set to empty string and proceed without knowledge injection. After dispatch, log to `session.md`: "Applied N entries from M sessions in understand phase." (If zero, log "No prior knowledge available for understand phase.")
+Fill `{relevant_knowledge}` (mapped to `knowledge/understanding.md`): read `$HOME/.claude/e-build-knowledge/knowledge/understanding.md`, filter by project type tag, include top entries (~1500 tokens max). If file missing, empty, or malformed, set to empty string and proceed without knowledge injection. After dispatch, log to `session.md`: "Applied N entries from M sessions in understand phase." (If zero, log "No prior knowledge available for understand phase.")
 
 Verify `understanding.md` exists. Resolve "Open Questions" if possible; otherwise log warning and proceed.
 
@@ -108,7 +108,7 @@ Verify `understanding.md` exists. Resolve "Open Questions" if possible; otherwis
 
 Dispatch subagent (`Plan`) with `./prompts/plan.md` filled: `{state_dir}`, `{planning_knowledge}`.
 
-Fill `{planning_knowledge}`: read `$HOME/.claude/build-knowledge/knowledge/planning.md`, filter by project type tag, include top entries (~1500 tokens max). If file missing, empty, or malformed, set to empty string and proceed without knowledge injection. After dispatch, log to `session.md`: "Applied N entries from M sessions in plan phase." (If zero, log "No prior knowledge available for plan phase.")
+Fill `{planning_knowledge}`: read `$HOME/.claude/e-build-knowledge/knowledge/planning.md`, filter by project type tag, include top entries (~1500 tokens max). If file missing, empty, or malformed, set to empty string and proceed without knowledge injection. After dispatch, log to `session.md`: "Applied N entries from M sessions in plan phase." (If zero, log "No prior knowledge available for plan phase.")
 
 Verify `plan.md`: steps ordered, each has verification criterion, dependencies consistent.
 
@@ -116,7 +116,7 @@ Verify `plan.md`: steps ordered, each has verification criterion, dependencies c
 
 For each step in `plan.md`:
 1. Dispatch subagent (`general-purpose`) with `./prompts/execute-step.md`: `{state_dir}`, `{step_number}`, `{execution_knowledge}`.
-2. Fill `{execution_knowledge}`: read `$HOME/.claude/build-knowledge/knowledge/execution.md`, filter by project type tag, include top entries (~1500 tokens max). If file missing, empty, or malformed, set to empty string and proceed without knowledge injection. After dispatch, log to `session.md`: "Applied N entries from M sessions in execute phase." (If zero, log "No prior knowledge available for execute phase.")
+2. Fill `{execution_knowledge}`: read `$HOME/.claude/e-build-knowledge/knowledge/execution.md`, filter by project type tag, include top entries (~1500 tokens max). If file missing, empty, or malformed, set to empty string and proceed without knowledge injection. After dispatch, log to `session.md`: "Applied N entries from M sessions in execute phase." (If zero, log "No prior knowledge available for execute phase.")
 3. Fail -> retry once -> if still fails, log `**FAILED**` and continue.
 4. Plans >8 steps: parallelize independent steps in one message.
 
@@ -126,22 +126,22 @@ For each step in `plan.md`:
 
 Dispatch subagent (`general-purpose`) with `./prompts/verify.md`: `{state_dir}`, `{verification_methods}`, `{verification_knowledge}`.
 
-Fill `{verification_knowledge}`: read `$HOME/.claude/build-knowledge/knowledge/verification.md`, filter by project type tag, include top entries (~1500 tokens max). If file missing, empty, or malformed, set to empty string and proceed without knowledge injection. After dispatch, log to `session.md`: "Applied N entries from M sessions in verify phase." (If zero, log "No prior knowledge available for verify phase.")
+Fill `{verification_knowledge}`: read `$HOME/.claude/e-build-knowledge/knowledge/verification.md`, filter by project type tag, include top entries (~1500 tokens max). If file missing, empty, or malformed, set to empty string and proceed without knowledge injection. After dispatch, log to `session.md`: "Applied N entries from M sessions in verify phase." (If zero, log "No prior knowledge available for verify phase.")
 
 Read `verify-report.md`: all PASS → this iteration complete. Any FAIL/PARTIAL → Phase 5.
 
-## Phase 4.5: Think Analysis (Post-Verification)
+## Phase 4.5: E-Think Analysis (Post-Verification)
 
 Runs after every Phase 4 verification. Provides deep analysis of the verification result before deciding whether to fix or proceed.
 
-1. Dispatch subagent (`general-purpose`) with `./prompts/think-hook-verify.md`: `{state_dir}`, `{verification_methods}`.
-2. Read `{state_dir}/think-recommendation.md`.
+1. Dispatch subagent (`general-purpose`) with `./prompts/e-think-hook-verify.md`: `{state_dir}`, `{verification_methods}`.
+2. Read `{state_dir}/e-think-recommendation.md`.
 3. Follow the recommendation:
    - `continue-fixing` → proceed to Phase 5 Fix. If the think analysis identified a specific root cause, include it in the fix context.
    - `narrow-scope` → go back to Phase 3 Execution with a reduced scope (the think analysis will specify what to focus on).
    - `re-verify` → go back to Phase 4 with adjusted verification methods.
    - `proceed` → skip Phase 5, go directly to the iteration loop (this iteration is done).
-   - `deep-analysis` → the think-hook-verify agent has already started root-cause analysis. Read `{state_dir}/think-root-cause.md` if it exists, then proceed to Phase 5 Fix with focused scope.
+   - `deep-analysis` → the e-think-hook-verify agent has already started root-cause analysis. Read `{state_dir}/e-think-root-cause.md` if it exists, then proceed to Phase 5 Fix with focused scope.
 
 ## Phase 5: Iteration Fix
 
@@ -173,8 +173,8 @@ INNER LOOP (fix rounds within one iteration):
 1. Initialize `current_iteration = 1`.
 2. Execute Phases 1-5 for `current_iteration`.
 3. After iteration completes (Phase 5 convergence or stall):
-   - Dispatch think-hook-iterate subagent with `./prompts/think-hook-iterate.md`: `{state_dir}`, `{current_iteration}`.
-   - Read `{state_dir}/think-iterate-recommendation.md`. Follow the recommendation:
+   - Dispatch e-think-hook-iterate subagent with `./prompts/e-think-hook-iterate.md`: `{state_dir}`, `{current_iteration}`.
+   - Read `{state_dir}/e-think-iterate-recommendation.md`. Follow the recommendation:
      - `stop-iterate` → proceed to Phase 6.
      - `next-iteration` → continue to next outer iteration below.
      - `pivot` → go back to Phase 1 (re-understand) or Phase 2 (re-plan).
@@ -197,7 +197,7 @@ INNER LOOP (fix rounds within one iteration):
 
 Runs after the iteration loop completes (success or max iterations reached).
 
-1. Dispatch subagent (`general-purpose`) with `./prompts/extract-knowledge.md` filled: `{state_dir}`, `{knowledge_dir}` = `$HOME/.claude/build-knowledge`. Then dispatch subagent with `./prompts/extract-metrics.md` filled: `{state_dir}`, `{knowledge_dir}`, `{skill_dir}` (the directory containing this skill's prompts, typically resolved from the skill installation path).
+1. Dispatch subagent (`general-purpose`) with `./prompts/extract-knowledge.md` filled: `{state_dir}`, `{knowledge_dir}` = `$HOME/.claude/e-build-knowledge`. Then dispatch subagent with `./prompts/extract-metrics.md` filled: `{state_dir}`, `{knowledge_dir}`, `{skill_dir}` (the directory containing this skill's prompts, typically resolved from the skill installation path).
 2. After extraction, check if any knowledge file exceeds ~200 lines; if so, dispatch compaction subagent with `./prompts/compact-knowledge.md`: `{knowledge_dir}`.
 
 ## Phase 7: Prompt Evolution (Self-Improvement)
@@ -206,7 +206,7 @@ Runs after Phase 6 if the knowledge store has 3+ sessions with metrics.
 
 1. Check skip conditions: skip if project type is `skill-modification`, if fewer than 3 total sessions in aggregate metrics, or if knowledge files are empty/missing.
    - **Dry-run mode**: If `--dry-run` is set, Phase 7 runs in read-only mode. The evolution report is still generated (proposals, validations, and bloat warnings are computed), but no prompt files are modified, no version backups are created, and the changelog is not updated. The report will be marked as "DRY RUN".
-2. Dispatch subagent (`general-purpose`) with `./prompts/evolve-prompts.md` filled: `{skill_dir}` (the directory containing this skill's prompts, typically resolved from the skill installation path), `{knowledge_dir}` = `$HOME/.claude/build-knowledge`, `{state_dir}`, `{project_type}` (from session.md), `{dry_run}` = `"true"` or `"false"` (from `--dry-run` flag).
+2. Dispatch subagent (`general-purpose`) with `./prompts/evolve-prompts.md` filled: `{skill_dir}` (the directory containing this skill's prompts, typically resolved from the skill installation path), `{knowledge_dir}` = `$HOME/.claude/e-build-knowledge`, `{state_dir}`, `{project_type}` (from session.md), `{dry_run}` = `"true"` or `"false"` (from `--dry-run` flag).
 3. The evolution agent will:
    - Analyze knowledge entries for each of the 5 core prompts
    - Generate proposals based on multi-session patterns
@@ -266,7 +266,7 @@ Print: iterations, remaining issues, log path. Include count of learnings extrac
 ## Rollback
 
 To revert a prompt template to a previous version:
-1. List versions: `ls $HOME/.claude/build-knowledge/prompt-versions/`
+1. List versions: `ls $HOME/.claude/e-build-knowledge/prompt-versions/`
 2. Read the version metadata comment at the top of the desired `.v{N}` file
 3. Copy the version file over the live prompt: `cp {version-file} {skill_dir}/prompts/{filename}` (where `{skill_dir}` is the directory containing this skill's prompts).
 4. The next evolution cycle will detect the manual change (the file will differ from the latest version backup) and skip auto-evolution for that prompt. To resume auto-evolution, apply the versioned backup over the live prompt, then the next evolution cycle will detect them as identical and proceed normally.

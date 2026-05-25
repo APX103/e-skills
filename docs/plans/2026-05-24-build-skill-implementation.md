@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Create a `/build` skill for Claude Code that autonomously executes full engineering tasks with a self-driving understand→plan→execute→verify→iterate loop, full process logging, and minimal human intervention.
+**Goal:** Create a `/e-build` skill for Claude Code that autonomously executes full engineering tasks with a self-driving understand→plan→execute→verify→iterate loop, full process logging, and minimal human intervention.
 
 **Architecture:** Single SKILL.md with supporting prompt files for each subagent phase. State persistence via file system (`.agent-log/` directory) rather than conversation context. Subagents are dispatched per phase for context isolation. The master skill orchestrates the flow, reads/writes state files, and manages iteration loops.
 
@@ -13,60 +13,60 @@
 ### Task 1: Create skill directory and SKILL.md frontmatter
 
 **Files:**
-- Create: `~/.claude/skills/build/SKILL.md`
+- Create: `~/.claude/skills/e-build/SKILL.md`
 
 **Step 1: Create the directory**
 
 ```bash
-mkdir -p ~/.claude/skills/build
+mkdir -p ~/.claude/skills/e-build
 ```
 
 **Step 2: Write the SKILL.md frontmatter and overview**
 
-Write `~/.claude/skills/build/SKILL.md` with:
-- YAML frontmatter: `name: build`, description focused on triggering conditions (NOT workflow summary), under 500 chars
+Write `~/.claude/skills/e-build/SKILL.md` with:
+- YAML frontmatter: `name: e-build`, description focused on triggering conditions (NOT workflow summary), under 500 chars
 - Brief overview section
 - Invocation syntax
 
 Frontmatter:
 ```yaml
 ---
-name: build
+name: e-build
 description: Use when starting a greenfield implementation, replicating an existing project, refactoring a module, or improving an existing codebase. Triggers on "build", "implement", "create project", "replicate", "engineer", or any task requiring multi-step code execution with verification.
 ---
 ```
 
 **Step 3: Verify frontmatter**
 
-Run: `head -5 ~/.claude/skills/build/SKILL.md`
-Expected: YAML frontmatter with `name: build` and description starting with "Use when..."
+Run: `head -5 ~/.claude/skills/e-build/SKILL.md`
+Expected: YAML frontmatter with `name: e-build` and description starting with "Use when..."
 
 ---
 
 ### Task 2: Create the subagent prompt templates
 
-The build skill dispatches subagents for each phase. Each phase has its own prompt template file. Create all of them.
+The e-build skill dispatches subagents for each phase. Each phase has its own prompt template file. Create all of them.
 
 **Files:**
-- Create: `~/.claude/skills/build/prompts/understand.md`
-- Create: `~/.claude/skills/build/prompts/plan.md`
-- Create: `~/.claude/skills/build/prompts/execute-step.md`
-- Create: `~/.claude/skills/build/prompts/verify.md`
-- Create: `~/.claude/skills/build/prompts/fix.md`
-- Create: `~/.claude/skills/build/prompts/compress-log.md`
+- Create: `~/.claude/skills/e-build/prompts/understand.md`
+- Create: `~/.claude/skills/e-build/prompts/plan.md`
+- Create: `~/.claude/skills/e-build/prompts/execute-step.md`
+- Create: `~/.claude/skills/e-build/prompts/verify.md`
+- Create: `~/.claude/skills/e-build/prompts/fix.md`
+- Create: `~/.claude/skills/e-build/prompts/compress-log.md`
 
 **Step 1: Create prompts directory**
 
 ```bash
-mkdir -p ~/.claude/skills/build/prompts
+mkdir -p ~/.claude/skills/e-build/prompts
 ```
 
 **Step 2: Write understand.md**
 
-Content for `~/.claude/skills/build/prompts/understand.md`:
+Content for `~/.claude/skills/e-build/prompts/understand.md`:
 
 ```markdown
-You are a deep understanding agent for the /build skill.
+You are a deep understanding agent for the /e-build skill.
 
 Your job: Read and analyze the task description and all reference materials, then produce a comprehensive understanding document.
 
@@ -127,10 +127,10 @@ CRITICAL: Missing a requirement here costs many iterations later. Be thorough.
 
 **Step 3: Write plan.md**
 
-Content for `~/.claude/skills/build/prompts/plan.md`:
+Content for `~/.claude/skills/e-build/prompts/plan.md`:
 
 ```markdown
-You are a planning agent for the /build skill.
+You are a planning agent for the /e-build skill.
 
 Your job: Read the understanding document and create an atomic, ordered execution plan.
 
@@ -173,10 +173,10 @@ RULES:
 
 **Step 4: Write execute-step.md**
 
-Content for `~/.claude/skills/build/prompts/execute-step.md`:
+Content for `~/.claude/skills/e-build/prompts/execute-step.md`:
 
 ```markdown
-You are an execution agent for the /build skill.
+You are an execution agent for the /e-build skill.
 
 Your job: Execute ONE step of the execution plan by writing/modifying code.
 
@@ -209,10 +209,10 @@ RULES:
 
 **Step 5: Write verify.md**
 
-Content for `~/.claude/skills/build/prompts/verify.md`:
+Content for `~/.claude/skills/e-build/prompts/verify.md`:
 
 ```markdown
-You are a verification agent for the /build skill.
+You are a verification agent for the /e-build skill.
 
 Your job: Verify the implementation against requirements using the chosen verification methods.
 
@@ -277,10 +277,10 @@ CRITICAL: Be thorough. Every issue you catch saves an iteration. Every issue you
 
 **Step 6: Write fix.md**
 
-Content for `~/.claude/skills/build/prompts/fix.md`:
+Content for `~/.claude/skills/e-build/prompts/fix.md`:
 
 ```markdown
-You are a fix agent for the /build skill.
+You are a fix agent for the /e-build skill.
 
 Your job: Read the verification report and fix all identified issues.
 
@@ -315,10 +315,10 @@ RULES:
 
 **Step 7: Write compress-log.md**
 
-Content for `~/.claude/skills/build/prompts/compress-log.md`:
+Content for `~/.claude/skills/e-build/prompts/compress-log.md`:
 
 ```markdown
-You are a log compression agent for the /build skill.
+You are a log compression agent for the /e-build skill.
 
 Your job: Compress an overly long session.md log while preserving essential information.
 
@@ -364,7 +364,7 @@ RULES:
 **Step 8: Verify all prompt files exist**
 
 ```bash
-ls -la ~/.claude/skills/build/prompts/
+ls -la ~/.claude/skills/e-build/prompts/
 ```
 Expected: 6 files (understand.md, plan.md, execute-step.md, verify.md, fix.md, compress-log.md)
 
@@ -373,11 +373,11 @@ Expected: 6 files (understand.md, plan.md, execute-step.md, verify.md, fix.md, c
 ### Task 3: Write the main SKILL.md body
 
 **Files:**
-- Modify: `~/.claude/skills/build/SKILL.md`
+- Modify: `~/.claude/skills/e-build/SKILL.md`
 
 **Step 1: Write the complete SKILL.md**
 
-Write the full content to `~/.claude/skills/build/SKILL.md`. This is the orchestration document that tells Claude how to execute the build loop.
+Write the full content to `~/.claude/skills/e-build/SKILL.md`. This is the orchestration document that tells Claude how to execute the build loop.
 
 The skill should contain these sections:
 
@@ -402,18 +402,18 @@ Full content:
 
 ```markdown
 ---
-name: build
+name: e-build
 description: Use when starting a greenfield implementation, replicating an existing project, refactoring a module, or improving an existing codebase. Triggers on "build", "implement", "create project", "replicate", "engineer", or any task requiring multi-step code execution with verification.
 ---
 
-# /build
+# /e-build
 
 Self-driving execution loop: understand → plan → execute → verify → iterate. File-based state, subagent isolation, full process logging. Human only interacts at Phase 0.
 
 ## Invocation
 
 ```
-/build "<task description>" [--iterations N] [--verification "method1,method2"]
+/e-build "<task description>" [--iterations N] [--verification "method1,method2"]
 ```
 
 - `<task description>`: What to build/improve. Can include file paths, URLs, or references.
@@ -425,7 +425,7 @@ Self-driving execution loop: understand → plan → execute → verify → iter
 All state in files. Never in conversation context.
 
 ```
-.agent-log/<timestamp>-build/
+.agent-log/<timestamp>-e-build/
   session.md          # Master log: head=goal, tail=progress
   understanding.md    # Phase 1 output
   plan.md             # Phase 2 output
@@ -468,7 +468,7 @@ digraph build {
 **This is the ONLY phase requiring human interaction.**
 
 1. Parse invocation arguments: extract task description, iterations count, verification methods.
-2. Create state directory: `.agent-log/<YYYY-MM-DD-HHMMSS>-build/`
+2. Create state directory: `.agent-log/<YYYY-MM-DD-HHMMSS>-e-build/`
 3. Initialize `session.md` with Goal section (the task description).
 4. If `--verification` was provided, use those methods. Otherwise:
    - Analyze the project to determine available verification methods.
@@ -626,8 +626,8 @@ When done, print a summary to the human:
 Build complete.
   Iterations: N
   Issues remaining: M (if any)
-  Log: .agent-log/<timestamp>-build/session.md
-  Full details: head -20 .agent-log/<timestamp>-build/session.md
+  Log: .agent-log/<timestamp>-e-build/session.md
+  Full details: head -20 .agent-log/<timestamp>-e-build/session.md
 ```
 
 If issues remain, tell the human which issues and suggest next steps.
@@ -646,7 +646,7 @@ If issues remain, tell the human which issues and suggest next steps.
 **Step 2: Verify the SKILL.md is valid**
 
 ```bash
-wc -w ~/.claude/skills/build/SKILL.md && head -6 ~/.claude/skills/build/SKILL.md
+wc -w ~/.claude/skills/e-build/SKILL.md && head -6 ~/.claude/skills/e-build/SKILL.md
 ```
 Expected: Word count under 500 for frequently-loaded sections, valid YAML frontmatter.
 
@@ -660,31 +660,31 @@ Expected: Word count under 500 for frequently-loaded sections, valid YAML frontm
 **Step 1: Verify directory structure**
 
 ```bash
-find ~/.claude/skills/build -type f | sort
+find ~/.claude/skills/e-build -type f | sort
 ```
 
 Expected:
 ```
-~/.claude/skills/build/SKILL.md
-~/.claude/skills/build/prompts/compress-log.md
-~/.claude/skills/build/prompts/execute-step.md
-~/.claude/skills/build/prompts/fix.md
-~/.claude/skills/build/prompts/plan.md
-~/.claude/skills/build/prompts/understand.md
-~/.claude/skills/build/prompts/verify.md
+~/.claude/skills/e-build/SKILL.md
+~/.claude/skills/e-build/prompts/compress-log.md
+~/.claude/skills/e-build/prompts/execute-step.md
+~/.claude/skills/e-build/prompts/fix.md
+~/.claude/skills/e-build/prompts/plan.md
+~/.claude/skills/e-build/prompts/understand.md
+~/.claude/skills/e-build/prompts/verify.md
 ```
 
 **Step 2: Verify frontmatter parses correctly**
 
 ```bash
-head -3 ~/.claude/skills/build/SKILL.md
+head -3 ~/.claude/skills/e-build/SKILL.md
 ```
 
-Expected: Valid YAML with `name: build` and `description:` starting with "Use when..."
+Expected: Valid YAML with `name: e-build` and `description:` starting with "Use when..."
 
 **Step 3: Test skill invocation recognition**
 
-Start a new Claude Code session and type `/build`. Verify the skill appears in the available skills list and its SKILL.md content is loaded.
+Start a new Claude Code session and type `/e-build`. Verify the skill appears in the available skills list and its SKILL.md content is loaded.
 
 ---
 
@@ -698,14 +698,14 @@ Start a new Claude Code session and type `/build`. Verify the skill appears in t
 Create a temporary test directory:
 
 ```bash
-mkdir -p /tmp/build-skill-test && cd /tmp/build-skill-test
+mkdir -p /tmp/e-build-skill-test && cd /tmp/e-build-skill-test
 git init
 ```
 
-**Step 2: Run /build on a trivial task**
+**Step 2: Run /e-build on a trivial task**
 
 ```
-/build "Create a simple Python CLI tool called 'greet' that takes a name as argument and prints 'Hello, {name}!' Support --iterations 1 --verification code-review,automated-testing
+/e-build "Create a simple Python CLI tool called 'greet' that takes a name as argument and prints 'Hello, {name}!' Support --iterations 1 --verification code-review,automated-testing
 ```
 
 **Step 3: Verify outputs**
@@ -729,5 +729,5 @@ Expected: Clear Goal section, Verification Plan section, and Phase entries with 
 **Step 5: Clean up**
 
 ```bash
-rm -rf /tmp/build-skill-test
+rm -rf /tmp/e-build-skill-test
 ```

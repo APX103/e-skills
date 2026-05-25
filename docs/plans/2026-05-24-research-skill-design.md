@@ -8,8 +8,8 @@ The skill complements the existing system instead of replacing it:
 
 - `brainstorming` clarifies the initial contract when the goal is vague.
 - `e-research` owns the research loop: charter -> investigation -> experiment -> evidence review -> synthesis.
-- `think` supplies analysis packs for unknowns, assumptions, evidence quality, failures, and next experiments.
-- `build` executes engineering-heavy experiments when code, environments, tests, or benchmarks are needed.
+- `e-think` supplies analysis packs for unknowns, assumptions, evidence quality, failures, and next experiments.
+- `e-build` executes engineering-heavy experiments when code, environments, tests, or benchmarks are needed.
 
 ## Success Criteria
 
@@ -38,15 +38,15 @@ The charter defines:
 
 ### Phase 1: Investigation
 
-Use high-information sources first: existing files, docs, logs, papers, APIs, benchmarks, or public sources when freshness matters. Invoke `think` packs such as `investigation`, `assumption-surfacing`, and `evidence-strength` when the task has unknowns or thin evidence.
+Use high-information sources first: existing files, docs, logs, papers, APIs, benchmarks, or public sources when freshness matters. Invoke `e-think` packs such as `investigation`, `assumption-surfacing`, and `evidence-strength` when the task has unknowns or thin evidence.
 
 ### Phase 2: Experiment
 
-Design the smallest experiment that can change belief about one hypothesis. For CS research, this may involve creating a benchmark, implementing a prototype, running simulations, testing algorithms, or reproducing a paper result. If the experiment is engineering-heavy, route execution through `build`.
+Design the smallest experiment that can change belief about one hypothesis. For CS research, this may involve creating a benchmark, implementing a prototype, running simulations, testing algorithms, or reproducing a paper result. If the experiment is engineering-heavy, route execution through `e-build`.
 
 ### Phase 3: Evidence Review
 
-After each experiment, verify whether the result is genuine. Use `think` packs to classify success or failure, assess evidence strength, surface assumptions, and decide the next experiment.
+After each experiment, verify whether the result is genuine. Use `e-think` packs to classify success or failure, assess evidence strength, surface assumptions, and decide the next experiment.
 
 ### Phase 4: Synthesis
 
@@ -76,4 +76,4 @@ The skill should include:
 - `skills/e-research/prompts/experiment.md`: designs minimal experiments.
 - `skills/e-research/prompts/synthesis.md`: produces evidence-backed reports.
 
-The `SKILL.md` should reference `think` and `build` instead of duplicating their detailed procedures.
+The `SKILL.md` should reference `e-think` and `e-build` instead of duplicating their detailed procedures.
