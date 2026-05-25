@@ -2,13 +2,13 @@
 
 ## Overview
 
-将"Agent 思维包"系统整合到 engineer_skills 项目中，为 build 循环提供深度分析和实践闭环能力。采用**独立 /e-think skill + build 集成钩子**的方案。
+将"Agent 思维包"系统整合到 engineer_skills 项目中，为 e-build 循环提供深度分析和实践闭环能力。采用**独立 /e-think skill + e-build 集成钩子**的方案。
 
 ## Architecture
 
 ```
 skills/
-  think/                         # 独立 /e-think skill
+  e-think/                       # 独立 /e-think skill
     SKILL.md                     # skill 定义 + 触发规则 + 闭环流程
     prompts/
       template.md                # 通用思维包模板
@@ -17,8 +17,8 @@ skills/
       root-cause.md              # 包3: 根因分析
       main-contradiction.md      # 包4: 主要矛盾
       next-experiment.md         # 包5: 下一轮实验
-  build/
-    SKILL.md                     # 在 Phase 4/5 间增加 think 钩子
+  e-build/
+    SKILL.md                     # 在 Phase 4/5 间增加 e-think 钩子
     prompts/
       e-think-hook-verify.md       # 验证后调用思维包的路由逻辑
       e-think-hook-iterate.md      # 迭代前调用思维包的路由逻辑
@@ -81,7 +81,7 @@ JSON 格式：
 ```
 Phase 4: Verify → 产出验证报告
     ↓
-Phase 4.5: Think
+Phase 4.5: E-Think
     ├─ 验证通过 → verify-success 包
     │   → 证据弱：回到 Phase 3（缩小范围）
     │   → 证据强：进入 Phase 6
@@ -97,7 +97,7 @@ Phase 4.5: Think
 
 ### 节点 2: Phase 5 Fix 收敛后 / Phase 6 之前
 
-Fix 循环收敛后，调用 next-experiment 包评估是否需要下一轮 build 循环。
+Fix 循环收敛后，调用 next-experiment 包评估是否需要下一轮 e-build 循环。
 
 ### 与现有机制的关系
 

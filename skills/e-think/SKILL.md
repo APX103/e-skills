@@ -176,17 +176,17 @@ For the selected pack (and each subsequent pack in the chain):
    - State directory path for full details
 3. If `--from-e-build`: append a recommendation back to the e-build session's `session.md` indicating what the e-build skill should do next (continue fixing, narrow scope, or proceed to knowledge extraction).
 
-## Build Integration Protocol
+## E-Build Integration Protocol
 
 When called with `--from-e-build`, the e-think skill reads from and writes to the e-build session:
 
-**Input from build:**
-- `{build_state_dir}/session.md` — goal, iteration history
-- `{build_state_dir}/verify-report.md` — verification results (triggers verify-success or verify-failure)
-- `{build_state_dir}/understanding.md` — original requirements
-- `{build_state_dir}/plan.md` — what was planned
+**Input from e-build:**
+- `{e_build_state_dir}/session.md` — goal, iteration history
+- `{e_build_state_dir}/verify-report.md` — verification results (triggers verify-success or verify-failure)
+- `{e_build_state_dir}/understanding.md` — original requirements
+- `{e_build_state_dir}/plan.md` — what was planned
 
-**Output to build (appended to `{build_state_dir}/session.md`):**
+**Output to e-build (appended to `{e_build_state_dir}/session.md`):**
 ```
 ## E-Think Analysis <timestamp>
 **Entry pack**: [which pack was triggered]

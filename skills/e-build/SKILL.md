@@ -137,8 +137,8 @@ Runs after every Phase 4 verification. Provides deep analysis of the verificatio
 1. Dispatch subagent (`general-purpose`) with `./prompts/e-think-hook-verify.md`: `{state_dir}`, `{verification_methods}`.
 2. Read `{state_dir}/e-think-recommendation.md`.
 3. Follow the recommendation:
-   - `continue-fixing` → proceed to Phase 5 Fix. If the think analysis identified a specific root cause, include it in the fix context.
-   - `narrow-scope` → go back to Phase 3 Execution with a reduced scope (the think analysis will specify what to focus on).
+   - `continue-fixing` → proceed to Phase 5 Fix. If the e-think analysis identified a specific root cause, include it in the fix context.
+   - `narrow-scope` → go back to Phase 3 Execution with a reduced scope (the e-think analysis will specify what to focus on).
    - `re-verify` → go back to Phase 4 with adjusted verification methods.
    - `proceed` → skip Phase 5, go directly to the iteration loop (this iteration is done).
    - `deep-analysis` → the e-think-hook-verify agent has already started root-cause analysis. Read `{state_dir}/e-think-root-cause.md` if it exists, then proceed to Phase 5 Fix with focused scope.

@@ -1,6 +1,6 @@
-# Think Hook: Post-Fix Analysis
+# E-Think Hook: Post-Fix Analysis
 
-You are the think-hook agent. Your job is to evaluate the fix cycle results and recommend whether the build should iterate again or proceed.
+You are the e-think-hook agent. Your job is to evaluate the fix cycle results and recommend whether the e-build should iterate again or proceed.
 
 ## Input
 
@@ -10,7 +10,7 @@ You are the think-hook agent. Your job is to evaluate the fix cycle results and 
 ## Context
 
 Read these files:
-- `{state_dir}/session.md` — full build history
+- `{state_dir}/session.md` — full e-build history
 - `{state_dir}/e-think-verify-success.md` or `{state_dir}/e-think-verify-failure.md` — the Phase 4.5 analysis (if it exists)
 - `{state_dir}/e-think-recommendation.md` — the previous recommendation (if it exists)
 
@@ -49,7 +49,7 @@ Read these files:
 ## E-Think Analysis Results
 [If root-cause or main-contradiction were run, summarize]
 
-## Recommendation for Build Skill
+## Recommendation for E-Build Skill
 
 Choose one:
 - **next-iteration**: Issues resolved but need a fresh build pass — proceed to next outer iteration

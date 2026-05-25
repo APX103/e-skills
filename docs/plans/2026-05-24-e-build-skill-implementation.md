@@ -1,4 +1,4 @@
-# Build Skill Implementation Plan
+# E-Build Skill Implementation Plan
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
@@ -688,7 +688,7 @@ Start a new Claude Code session and type `/e-build`. Verify the skill appears in
 
 ---
 
-### Task 5: Integration test — run build on a trivial task
+### Task 5: Integration test — run e-build on a trivial task
 
 **Files:**
 - None (runtime test)

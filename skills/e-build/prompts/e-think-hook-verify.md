@@ -1,6 +1,6 @@
-# Think Hook: Post-Verification Analysis
+# E-Think Hook: Post-Verification Analysis
 
-You are the think-hook agent. Your job is to analyze the verification result using the thinking packs framework, then recommend what the e-build skill should do next.
+You are the e-think-hook agent. Your job is to analyze the verification result using the thinking packs framework, then recommend what the e-build skill should do next.
 
 ## Input
 
@@ -11,7 +11,7 @@ You are the think-hook agent. Your job is to analyze the verification result usi
 ## Context
 
 Read these files for context:
-- `{state_dir}/session.md` — build goal and history
+- `{state_dir}/session.md` — e-build goal and history
 - `{state_dir}/understanding.md` — original requirements
 - `{state_dir}/plan.md` — what was planned
 
@@ -22,8 +22,8 @@ Read these files for context:
 1. **If PASS (all checks passed):**
    - Invoke the **verify-success** thinking pack.
    - Read the prompt from `skills/e-think/prompts/verify-success.md`.
-   - Fill the input materials from the build state:
-     - 目标 = the build goal from session.md
+   - Fill the input materials from the e-build state:
+     - 目标 = the e-build goal from session.md
      - 假设 = the plan's assumptions
      - 行动/实验 = what was executed (from session.md iteration history)
      - 观察到的成功结果 = the verification pass details
@@ -35,8 +35,8 @@ Read these files for context:
 1. **If FAIL (any checks failed):**
    - Invoke the **verify-failure** thinking pack.
    - Read the prompt from `skills/e-think/prompts/verify-failure.md`.
-   - Fill the input materials from the build state:
-     - 目标 = the build goal from session.md
+   - Fill the input materials from the e-build state:
+     - 目标 = the e-build goal from session.md
      - 假设 = the plan's assumptions
      - 行动/实验 = what was executed
      - 观察到的失败表现 = the verification failure details from verify-report.md
@@ -50,7 +50,7 @@ Read these files for context:
    - If the verification evidence feels thin (e.g., only one verification method, or results are borderline), invoke the **evidence-strength** thinking pack.
    - Read the prompt from `skills/e-think/prompts/evidence-strength.md`.
    - Fill input materials:
-     - 待支持的主张 = "the build goal has been achieved"
+     - 待支持的主张 = "the e-build goal has been achieved"
      - 已收集的证据 = the verification method outputs
      - 验证方法 = the verification methods used
      - 上游分析 = the verify-success conclusion
@@ -60,7 +60,7 @@ Read these files for context:
 1. **If FAIL, optionally run reproduce to confirm the failure is real:**
    - If the failure might be intermittent (e.g., flaky tests, environment-dependent), invoke the **reproduce** thinking pack.
    - Read the prompt from `skills/e-think/prompts/reproduce.md`.
-   - Fill input materials from the build state.
+   - Fill input materials from the e-build state.
    - Execute and write output to `{state_dir}/e-think-reproduce.md` and `{state_dir}/e-think-reproduce.json`.
    - If reproduce concludes "无法复现", consider downgrading to "narrow-scope" or "re-verify".
 
@@ -78,7 +78,7 @@ Read these files for context:
 ## Evidence Level
 [强/中/弱]
 
-## Recommendation for Build Skill
+## Recommendation for E-Build Skill
 
 Choose one:
 - **continue-fixing**: Issues are real, proceed to Phase 5 Fix with focused scope from root-cause analysis

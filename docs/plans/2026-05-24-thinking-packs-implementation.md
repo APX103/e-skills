@@ -4,7 +4,7 @@
 
 **Goal:** Create a `/e-think` skill that implements the 实践闭环 (practice loop) thinking framework with 5 core thinking packs, and integrate it as an automatic analysis layer in the existing `/e-build` skill.
 
-**Architecture:** Independent `/e-think` skill with 5 prompt-based thinking packs (verify-success, verify-failure, root-cause, main-contradiction, next-experiment). Each pack is a prompt file following a uniform interface format. e-build skill gains a Phase 4.5 think hook that auto-dispatches packs after verification. State passes through `.agent-log/thinking/` files and JSON artifacts for cross-pack chaining.
+**Architecture:** Independent `/e-think` skill with 5 prompt-based thinking packs (verify-success, verify-failure, root-cause, main-contradiction, next-experiment). Each pack is a prompt file following a uniform interface format. e-build skill gains a Phase 4.5 e-think hook that auto-dispatches packs after verification. State passes through `.agent-log/thinking/` files and JSON artifacts for cross-pack chaining.
 
 **Tech Stack:** Claude Code skills (SKILL.md + prompts), file-based state, subagent dispatch
 
@@ -648,7 +648,7 @@ git commit -m "feat: add 5 core thinking pack prompts (verify-success, verify-fa
 
 **Step 1: Write SKILL.md**
 
-The SKILL.md follows the e-build skill's pattern: YAML frontmatter, invocation, architecture, phases. The e-think skill has 3 phases instead of build's 7.
+The SKILL.md follows the e-build skill's pattern: YAML frontmatter, invocation, architecture, phases. The e-think skill has 3 phases instead of e-build's 7.
 
 ```markdown
 ---
@@ -668,7 +668,7 @@ Structured analysis: judge → attribute → prioritize → design next action. 
 
 - `<context>`: What to analyze. May include goals, results, observations.
 - `--pack <name>`: Skip auto-routing, directly invoke a specific pack. Options: `verify-success`, `verify-failure`, `root-cause`, `main-contradiction`, `next-experiment`.
-- `--from-e-build`: Indicates this was auto-triggered by the e-build skill. Read state from the build session directory.
+- `--from-e-build`: Indicates this was auto-triggered by the e-build skill. Read state from the e-build session directory.
 
 ## Architecture
 
@@ -722,7 +722,7 @@ digraph { rankdir=TB; node[shape=box];
 
 1. Parse args. Create `.agent-log/<YYYY-MM-DD-HHMMSS>-e-think/`.
 2. Init `session.md` with context from `<context>` arg.
-3. If `--from-e-build`: read the build session's `session.md`, `verify-report.md`, `understanding.md`, and `plan.md` to populate context.
+3. If `--from-e-build`: read the e-build session's `session.md`, `verify-report.md`, `understanding.md`, and `plan.md` to populate context.
 4. If `--pack` specified: skip auto-routing, go directly to that pack.
 5. If no `--pack`: auto-determine entry point:
    - Read context. If user describes a success → route to `verify-success`.
@@ -756,19 +756,19 @@ For the selected pack (and each subsequent pack in the chain):
    - Evidence strength
    - Recommended next action
    - State directory path for full details
-3. If `--from-e-build`: append a recommendation back to the build session's `session.md` indicating what the e-build skill should do next (continue fixing, narrow scope, or proceed to knowledge extraction).
+3. If `--from-e-build`: append a recommendation back to the e-build session's `session.md` indicating what the e-build skill should do next (continue fixing, narrow scope, or proceed to knowledge extraction).
 
-## Build Integration Protocol
+## E-Build Integration Protocol
 
-When called with `--from-e-build`, the e-think skill reads from and writes to the build session:
+When called with `--from-e-build`, the e-think skill reads from and writes to the e-build session:
 
-**Input from build:**
-- `{build_state_dir}/session.md` — goal, iteration history
-- `{build_state_dir}/verify-report.md` — verification results (triggers verify-success or verify-failure)
-- `{build_state_dir}/understanding.md` — original requirements
-- `{build_state_dir}/plan.md` — what was planned
+**Input from e-build:**
+- `{e_build_state_dir}/session.md` — goal, iteration history
+- `{e_build_state_dir}/verify-report.md` — verification results (triggers verify-success or verify-failure)
+- `{e_build_state_dir}/understanding.md` — original requirements
+- `{e_build_state_dir}/plan.md` — what was planned
 
-**Output to build (appended to `{build_state_dir}/session.md`):**
+**Output to e-build (appended to `{e_build_state_dir}/session.md`):**
 ```
 ## E-Think Analysis <timestamp>
 **Entry pack**: [which pack was triggered]
@@ -793,12 +793,12 @@ When called with `--from-e-build`, the e-think skill reads from and writes to th
 
 ```bash
 git add skills/e-think/SKILL.md
-git commit -m "feat: add /e-think skill with routing, pack chaining, and build integration protocol"
+git commit -m "feat: add /e-think skill with routing, pack chaining, and e-build integration protocol"
 ```
 
 ---
 
-## Task 4: Create the think-hook prompts for build integration
+## Task 4: Create the e-think-hook prompts for e-build integration
 
 **Files:**
 - Create: `skills/e-build/prompts/e-think-hook-verify.md`
@@ -809,9 +809,9 @@ git commit -m "feat: add /e-think skill with routing, pack chaining, and build i
 This prompt is dispatched by the e-build skill after Phase 4 (Verification). It determines which thinking pack to invoke and what to do with the result.
 
 ```markdown
-# Think Hook: Post-Verification Analysis
+# E-Think Hook: Post-Verification Analysis
 
-You are the think-hook agent. Your job is to analyze the verification result using the thinking packs framework, then recommend what the e-build skill should do next.
+You are the e-think-hook agent. Your job is to analyze the verification result using the thinking packs framework, then recommend what the e-build skill should do next.
 
 ## Input
 
@@ -822,7 +822,7 @@ You are the think-hook agent. Your job is to analyze the verification result usi
 ## Context
 
 Read these files for context:
-- `{state_dir}/session.md` — build goal and history
+- `{state_dir}/session.md` — e-build goal and history
 - `{state_dir}/understanding.md` — original requirements
 - `{state_dir}/plan.md` — what was planned
 
@@ -833,8 +833,8 @@ Read these files for context:
 2. **If PASS (all checks passed):**
    - You need to invoke the **verify-success** thinking pack.
    - Read the prompt from `skills/e-think/prompts/verify-success.md`.
-   - Fill the input materials from the build state:
-     - 目标 = the build goal from session.md
+   - Fill the input materials from the e-build state:
+     - 目标 = the e-build goal from session.md
      - 假设 = the plan's assumptions
      - 行动/实验 = what was executed (from session.md iteration history)
      - 观察到的成功结果 = the verification pass details
@@ -846,8 +846,8 @@ Read these files for context:
 3. **If FAIL (any checks failed):**
    - You need to invoke the **verify-failure** thinking pack.
    - Read the prompt from `skills/e-think/prompts/verify-failure.md`.
-   - Fill the input materials from the build state:
-     - 目标 = the build goal from session.md
+   - Fill the input materials from the e-build state:
+     - 目标 = the e-build goal from session.md
      - 假设 = the plan's assumptions
      - 行动/实验 = what was executed
      - 观察到的失败表现 = the verification failure details from verify-report.md
@@ -871,7 +871,7 @@ Read these files for context:
 ## Evidence Level
 [强/中/弱]
 
-## Recommendation for Build Skill
+## Recommendation for E-Build Skill
 
 Choose one:
 - **continue-fixing**: Issues are real, proceed to Phase 5 Fix with focused scope from root-cause analysis
@@ -907,9 +907,9 @@ Choose one:
 This prompt runs after the Phase 5 fix loop converges (or stalls), before the outer iteration loop decides whether to continue.
 
 ```markdown
-# Think Hook: Post-Fix Analysis
+# E-Think Hook: Post-Fix Analysis
 
-You are the think-hook agent. Your job is to evaluate the fix cycle results and recommend whether the build should iterate again or proceed.
+You are the e-think-hook agent. Your job is to evaluate the fix cycle results and recommend whether the e-build should iterate again or proceed.
 
 ## Input
 
@@ -919,7 +919,7 @@ You are the think-hook agent. Your job is to evaluate the fix cycle results and 
 ## Context
 
 Read these files:
-- `{state_dir}/session.md` — full build history
+- `{state_dir}/session.md` — full e-build history
 - `{state_dir}/e-think-verify-success.md` or `{state_dir}/e-think-verify-failure.md` — the Phase 4.5 analysis (if it exists)
 - `{state_dir}/e-think-recommendation.md` — the previous recommendation (if it exists)
 
@@ -948,7 +948,7 @@ Read these files:
 ## E-Think Analysis Results
 [If root-cause or main-contradiction were run, summarize]
 
-## Recommendation for Build Skill
+## Recommendation for E-Build Skill
 
 Choose one:
 - **next-iteration**: Issues resolved but need a fresh build pass — proceed to next outer iteration
@@ -979,23 +979,23 @@ Choose one:
 
 ```bash
 git add skills/e-build/prompts/e-think-hook-verify.md skills/e-build/prompts/e-think-hook-iterate.md
-git commit -m "feat: add think-hook prompts for build integration (Phase 4.5 and post-fix)"
+git commit -m "feat: add e-think-hook prompts for e-build integration (Phase 4.5 and post-fix)"
 ```
 
 ---
 
-## Task 5: Integrate thinking hooks into build SKILL.md
+## Task 5: Integrate e-think hooks into e-build SKILL.md
 
 **Files:**
 - Modify: `skills/e-build/SKILL.md`
 
-**Step 1: Add Phase 4.5 to build SKILL.md**
+**Step 1: Add Phase 4.5 to e-build SKILL.md**
 
 Insert a new phase between Phase 4 and Phase 5. In the Execution Flow digraph, add a P45 node. Add the full phase definition after the Phase 4 section (around line 116).
 
 Insert after the Phase 4 section (after "Any FAIL/PARTIAL → Phase 5."): Phase 4.5: E-Think Analysis (Post-Verification)
 
-Add to the digraph: P45[label="P4.5 Think"]; P4->P45; P45->P5[label="continue-fixing"]; P45->CL[label="proceed"]; P45->P4[label="re-verify"]; P45->P1[label="narrow-scope"]; P45->P5[label="deep-analysis"]
+Add to the digraph: P45[label="P4.5 E-Think"]; P4->P45; P45->P5[label="continue-fixing"]; P45->CL[label="proceed"]; P45->P4[label="re-verify"]; P45->P1[label="narrow-scope"]; P45->P5[label="deep-analysis"]
 
 Content:
 
@@ -1007,18 +1007,18 @@ Runs after every Phase 4 verification. Provides deep analysis of the verificatio
 1. Dispatch subagent (`general-purpose`) with `./prompts/e-think-hook-verify.md`: `{state_dir}`, `{verification_methods}`.
 2. Read `{state_dir}/e-think-recommendation.md`.
 3. Follow the recommendation:
-   - `continue-fixing` → proceed to Phase 5 Fix. If the think analysis identified a specific root cause, include it in the fix context.
-   - `narrow-scope` → go back to Phase 3 Execution with a reduced scope (the think analysis will specify what to focus on).
+   - `continue-fixing` → proceed to Phase 5 Fix. If the e-think analysis identified a specific root cause, include it in the fix context.
+   - `narrow-scope` → go back to Phase 3 Execution with a reduced scope (the e-think analysis will specify what to focus on).
    - `re-verify` → go back to Phase 4 with adjusted verification methods.
    - `proceed` → skip Phase 5, go directly to the iteration loop (this iteration is done).
    - `deep-analysis` → the e-think-hook-verify agent has already started root-cause analysis. Read `{state_dir}/e-think-root-cause.md` if it exists, then proceed to Phase 5 Fix with focused scope.
 ```
 
-Also update the "Phase 5: Iteration Fix" section to note that fix context may come from think analysis.
+Also update the "Phase 5: Iteration Fix" section to note that fix context may come from e-think analysis.
 
-**Step 2: Add post-fix think hook before iteration loop decision**
+**Step 2: Add post-fix e-think hook before iteration loop decision**
 
-In the "Iteration Loop" section, after the outer loop execution step 3 ("After iteration completes"), add a think analysis check:
+In the "Iteration Loop" section, after the outer loop execution step 3 ("After iteration completes"), add an e-think analysis check:
 
 After "If `current_iteration >= N`: stop. Proceed to Phase 6." add:
 
@@ -1031,7 +1031,7 @@ After "If `current_iteration >= N`: stop. Proceed to Phase 6." add:
 
 **Step 3: Update the Architecture section**
 
-In the Architecture section, add think analysis files to the state directory listing:
+In the Architecture section, add e-think analysis files to the state directory listing:
 
 ```markdown
 e-think-verify-success.md   # Phase 4.5 verify-success analysis
@@ -1050,7 +1050,7 @@ e-think-iterate-recommendation.md  # Post-fix recommendation
 
 ```bash
 git add skills/e-build/SKILL.md
-git commit -m "feat: integrate Phase 4.5 think hooks into e-build skill"
+git commit -m "feat: integrate Phase 4.5 e-think hooks into e-build skill"
 ```
 
 ---
@@ -1066,7 +1066,7 @@ git commit -m "feat: integrate Phase 4.5 think hooks into e-build skill"
 ./install.sh
 ```
 
-Expected output: `think: symlink created` (or `symlink updated`)
+Expected output: `e-think: symlink created` (or `symlink updated`)
 
 **Step 2: Verify symlinks**
 
@@ -1092,7 +1092,7 @@ skills/e-think/prompts/verify-failure.md
 skills/e-think/prompts/verify-success.md
 ```
 
-**Step 4: Verify build integration files exist**
+**Step 4: Verify e-build integration files exist**
 
 ```bash
 ls skills/e-build/prompts/e-think-hook-*.md
@@ -1134,7 +1134,7 @@ for f in verify-success verify-failure root-cause main-contradiction next-experi
 done
 ```
 
-For build integration:
+For e-build integration:
 ```bash
 test -f skills/e-build/prompts/e-think-hook-verify.md && echo "OK: e-think-hook-verify.md"
 test -f skills/e-build/prompts/e-think-hook-iterate.md && echo "OK: e-think-hook-iterate.md"
@@ -1165,7 +1165,7 @@ test -f shared/thinking-frameworks.md && echo "OK: shared/thinking-frameworks.md
 | 1 | Shared thinking frameworks | `shared/thinking-frameworks.md` |
 | 2 | 5 core thinking pack prompts | `skills/e-think/prompts/*.md` (5 files) |
 | 3 | /e-think SKILL.md | `skills/e-think/SKILL.md` |
-| 4 | Build integration prompts | `skills/e-build/prompts/e-think-hook-*.md` (2 files) |
-| 5 | Build SKILL.md integration | `skills/e-build/SKILL.md` (modified) |
+| 4 | E-build integration prompts | `skills/e-build/prompts/e-think-hook-*.md` (2 files) |
+| 5 | E-e-build SKILL.md integration | `skills/e-build/SKILL.md` (modified) |
 | 6 | Install and verify | `install.sh` (no changes expected) |
 | 7 | Smoke test | Verification only |

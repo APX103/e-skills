@@ -580,7 +580,7 @@ rm -rf ~/.hermes/skills/e-research
 
 - `docs/research-skill-usage.html`
 - `docs/hermes-e-research-install.md`
-- `docs/plans/2026-05-24-build-skill-design.md`
+- `docs/plans/2026-05-24-e-build-skill-design.md`
 - `docs/plans/2026-05-24-thinking-packs-design.md`
 - `docs/plans/2026-05-24-research-skill-design.md`
 
