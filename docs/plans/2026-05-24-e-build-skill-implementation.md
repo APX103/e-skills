@@ -286,7 +286,8 @@ Your job: Read the verification report and fix all identified issues.
 
 INPUTS:
 - State directory: {state_dir}
-- Iteration number: {iteration_number}
+- Outer iteration number: {current_iteration}
+- Fix round: {fix_round}
 
 INSTRUCTIONS:
 
@@ -298,11 +299,11 @@ INSTRUCTIONS:
 
 OUTPUT:
 - Fix the issues in the codebase
-- Create/update {state_dir}/iteration-{iteration_number}/changes.md with a summary of all fixes
+- Create/update {state_dir}/iteration-{current_iteration}/fix-round-{fix_round}/changes.md with a summary of all fixes
 - Append a log entry to {state_dir}/session.md:
 
 ```
-### Phase 5: Fix (iteration {iteration_number})
+### Phase 5: Fix (iteration {current_iteration}, fix round {fix_round})
 `{timestamp}` — Fixed {N} issues: {brief summary of fixes}
 ```
 
@@ -577,7 +578,7 @@ Agent({
 })
 ```
 
-Variables: `{state_dir}`, `{iteration_number}`.
+Variables: `{state_dir}`, `{current_iteration}`, `{fix_round}`.
 
 4. After fixes, go back to Phase 4 (re-verify).
 

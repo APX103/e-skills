@@ -5,7 +5,7 @@ badge: 行动生成
 trigger: 已有判断、根因或突破口，需要继续实践
 downstream:
   - condition: "实验设计完成"
-    next: "执行后回到 verify-success 或 verify-failure"
+    next: done
 ---
 
 # 下一轮实验包
@@ -97,10 +97,10 @@ downstream:
   "review_pack": "verify-success | verify-failure",
   "risks": ["..."],
   "next_action": "执行实验",
-  "downstream_pack": "verify-success | verify-failure"
+  "downstream_pack": "done"
 }
 ```
 
 ## 下游接口
 
-- 实验执行后 → verify-success 或 verify-failure（根据实验结果选择入口）
+- 实验设计完成 → done。实验执行后，根据实际结果重新进入 verify-success 或 verify-failure。

@@ -5,7 +5,7 @@ You are the e-think-hook agent. Your job is to evaluate the fix cycle results an
 ## Input
 
 - State directory: `{state_dir}`
-- Current iteration: {iteration_number}
+- Current outer iteration: {current_iteration}
 
 ## Context
 
@@ -13,6 +13,8 @@ Read these files:
 - `{state_dir}/session.md` — full e-build history
 - `{state_dir}/e-think-verify-success.md` or `{state_dir}/e-think-verify-failure.md` — the Phase 4.5 analysis (if it exists)
 - `{state_dir}/e-think-recommendation.md` — the previous recommendation (if it exists)
+
+When reusing e-think pack prompts inside this hook, adapt their default output paths to the e-build-prefixed paths named below. Do not write unprefixed pack output files such as `root-cause.md` in the e-build state directory.
 
 ## Instructions
 

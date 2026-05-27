@@ -141,15 +141,17 @@ digraph { rankdir=TB; node[shape=box];
 
 For the selected pack (and each subsequent pack in the chain):
 
-1. Dispatch subagent (`general-purpose`) with the corresponding prompt file: `skills/e-think/prompts/<pack-name>.md`.
-2. Fill placeholders in the prompt:
-   - `{state_dir}`: the thinking session directory
-   - `{upstream_json}`: if a previous pack ran, read its JSON output file
-   - `{frameworks}`: read `shared/thinking-frameworks.md` for relevant framework references
+1. Build a dispatch context for the pack:
+   - `state_dir`: the thinking session directory.
+   - `upstream_json`: if a previous pack ran, read its JSON output and include it in the dispatch message; otherwise use `{}`.
+   - `frameworks`: read only the relevant sections of `shared/thinking-frameworks.md` and include them in the dispatch message.
+   - `input_materials`: summarize the user context plus any upstream conclusions into the input fields requested by the pack prompt.
+2. Dispatch subagent (`general-purpose`) with the corresponding prompt file: `skills/e-think/prompts/<pack-name>.md` plus the dispatch context above. The individual pack prompts use `{state_dir}` for output paths; upstream context is supplied in the dispatch message, not as a template placeholder.
 3. The subagent writes both the markdown report and JSON output to `{state_dir}/`.
-4. Read the JSON output. If `downstream_pack` points to another pack, loop back to step 1 with that pack.
-5. Append to `session.md`: "[<pack-name>] <timestamp> — conclusion: <conclusion>, evidence: <level>, downstream: <next>"
-6. Continue until `downstream_pack` is terminal (done) or 10 packs have been executed.
+4. Validate the JSON output: it must include `pack`, `timestamp`, `conclusion`, `next_action`, and `downstream_pack`. If optional fields such as `evidence_level` are not relevant to the pack, use `"n/a"`.
+5. Read the JSON output. If `downstream_pack` points to another pack, loop back to step 1 with that pack.
+6. Append to `session.md`: "[<pack-name>] <timestamp> — conclusion: <conclusion>, evidence: <level>, downstream: <next>"
+7. Continue until `downstream_pack` is terminal (done) or 10 packs have been executed.
 
 ## Common Chaining Patterns
 
@@ -174,7 +176,7 @@ For the selected pack (and each subsequent pack in the chain):
    - Evidence strength
    - Recommended next action
    - State directory path for full details
-3. If `--from-e-build`: append a recommendation back to the e-build session's `session.md` indicating what the e-build skill should do next (continue fixing, narrow scope, or proceed to knowledge extraction).
+3. If `--from-e-build`: write `{e_build_state_dir}/e-think-recommendation.md` and append a matching summary to the e-build session's `session.md`, indicating what the e-build skill should do next (`continue-fixing`, `narrow-scope`, `re-verify`, `proceed`, or `deep-analysis`).
 
 ## E-Build Integration Protocol
 
@@ -186,13 +188,37 @@ When called with `--from-e-build`, the e-think skill reads from and writes to th
 - `{e_build_state_dir}/understanding.md` — original requirements
 - `{e_build_state_dir}/plan.md` — what was planned
 
-**Output to e-build (appended to `{e_build_state_dir}/session.md`):**
+**Output to e-build:**
+
+Write `{e_build_state_dir}/e-think-recommendation.md`:
+
+```markdown
+# E-Think Recommendation
+
+## Entry Pack
+[which pack was triggered]
+
+## Chain
+[pack1] -> [pack2] -> ... -> [packN]
+
+## Conclusion
+[final conclusion]
+
+## Recommendation for E-Build Skill
+[continue-fixing | narrow-scope | re-verify | proceed | deep-analysis]
+
+## Reasoning
+[why this routing decision follows from the evidence]
+```
+
+Append to `{e_build_state_dir}/session.md`:
+
 ```
 ## E-Think Analysis <timestamp>
 **Entry pack**: [which pack was triggered]
-**Chain**: [pack1] → [pack2] → ... → [packN]
+**Chain**: [pack1] -> [pack2] -> ... -> [packN]
 **Conclusion**: [final conclusion]
-**Recommendation**: [continue fixing | narrow scope | proceed to Phase 6 | redesign]
+**Recommendation**: [continue-fixing | narrow-scope | re-verify | proceed | deep-analysis]
 ```
 
 ## Common Mistakes

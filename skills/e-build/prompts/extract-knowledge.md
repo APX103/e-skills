@@ -27,7 +27,7 @@ Read the following files from `{state_dir}` (if they exist):
 | `understanding.md` | What requirements were identified, task type, constraints |
 | `plan.md` | What steps were planned, their dependencies and risk levels |
 | `verify-report.md` | What issues were found, severity breakdown, which requirements passed/failed |
-| `iteration-N/changes.md` | What was fixed in each iteration and why |
+| `iteration-N/fix-round-M/changes.md` | What was fixed in each fix round and why |
 
 Not all files will exist. A session that failed during understanding will have no plan. A session that failed during execution will have no verify-report. Handle missing files gracefully -- extract whatever is available.
 
@@ -64,7 +64,7 @@ Write entries like:
 - `[project-type]` **[insight]**: [actionable description] (sessions: {count}) [YYYY-MM-DD]
 ```
 
-#### Planning learnings (from `plan.md`, `session.md`, `iteration-N/changes.md`)
+#### Planning learnings (from `plan.md`, `session.md`, `iteration-N/fix-round-M/changes.md`)
 
 Look for:
 - Steps that were too large and should have been split.
@@ -79,7 +79,7 @@ Write entries like:
 - `[project-type]` **[insight]**: [actionable description] (sessions: {count}) [YYYY-MM-DD]
 ```
 
-#### Execution learnings (from `session.md`, `iteration-N/changes.md`)
+#### Execution learnings (from `session.md`, `iteration-N/fix-round-M/changes.md`)
 
 Look for:
 - Environment issues (missing dependencies, version conflicts, path problems).
@@ -93,7 +93,7 @@ Write entries like:
 - `[project-type]` **[insight]**: [actionable description] (sessions: {count}) [YYYY-MM-DD]
 ```
 
-#### Verification learnings (from `verify-report.md`, `iteration-N/changes.md`)
+#### Verification learnings (from `verify-report.md`, `iteration-N/fix-round-M/changes.md`)
 
 Look for:
 - Issues that verification caught (and whether they were caught by automated tests or manual review).
@@ -111,18 +111,18 @@ Write entries like:
 
 Before writing learnings, extract and record quantitative metadata from the session. This data enables future sessions to identify patterns like "which step types have high failure rates" or "which verification methods are most effective."
 
-From `session.md`, `plan.md`, and `iteration-N/changes.md`, extract:
+From `session.md`, `plan.md`, and `iteration-N/fix-round-M/changes.md`, extract:
 
 | Metric | How to find it |
 |--------|---------------|
 | **Total steps planned** | Count steps in `plan.md` |
-| **Steps passed on first try** | Steps with no mention in any `iteration-N/changes.md` |
-| **Steps needing fix iterations** | Steps mentioned in `iteration-N/changes.md`, count how many iterations each needed |
-| **Total fix iterations** | Count `iteration-N/` directories |
+| **Steps passed on first try** | Steps with no mention in any `iteration-N/fix-round-M/changes.md` |
+| **Steps needing fix iterations** | Steps mentioned in `iteration-N/fix-round-M/changes.md`, count how many fix rounds each needed |
+| **Total fix iterations** | Count `fix-round-M/` directories under all `iteration-N/` directories |
 | **Convergence pattern** | Did issues decrease each iteration? Stay the same? Increase? |
 | **Verification methods used** | From `session.md` Verification Plan section |
 | **Verification effectiveness** | From `verify-report.md`: which methods caught issues? Which missed issues found later? |
-| **Common failure root causes** | From `iteration-N/changes.md`: recurring patterns across steps (e.g., "missing edge case handling", "wrong API usage") |
+| **Common failure root causes** | From `iteration-N/fix-round-M/changes.md`: recurring patterns across steps (e.g., "missing edge case handling", "wrong API usage") |
 
 Include these metrics in the summary appended to `session.md` (see Output section).
 
@@ -210,4 +210,4 @@ After writing all learnings, append a summary entry to `{state_dir}/session.md`:
 
 ## Structured Metrics
 
-After writing learnings and appending the summary to session.md, also dispatch the metrics extraction subagent with `./prompts/extract-metrics.md` filled: `{state_dir}`, `{knowledge_dir}`. This produces a structured JSON metrics record alongside the text summary above. The metrics extraction is separate from knowledge extraction to keep concerns isolated.
+Do not dispatch the metrics extraction subagent from this prompt. The e-build orchestrator runs `./prompts/extract-metrics.md` exactly once after knowledge extraction completes. This separation prevents duplicate `sessions.jsonl` entries and keeps this prompt focused on reusable text learnings.

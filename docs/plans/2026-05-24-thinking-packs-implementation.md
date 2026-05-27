@@ -2,9 +2,9 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Create a `/e-think` skill that implements the 实践闭环 (practice loop) thinking framework with 5 core thinking packs, and integrate it as an automatic analysis layer in the existing `/e-build` skill.
+**Goal:** Create a `/e-think` skill that implements the 实践闭环 (practice loop) thinking framework with a prompt-based thinking pack set, and integrate it as an automatic analysis layer in the existing `/e-build` skill.
 
-**Architecture:** Independent `/e-think` skill with 5 prompt-based thinking packs (verify-success, verify-failure, root-cause, main-contradiction, next-experiment). Each pack is a prompt file following a uniform interface format. e-build skill gains a Phase 4.5 e-think hook that auto-dispatches packs after verification. State passes through `.agent-log/thinking/` files and JSON artifacts for cross-pack chaining.
+**Architecture:** Independent `/e-think` skill with prompt-based thinking packs such as verify-success, verify-failure, root-cause, main-contradiction, next-experiment, reproduce, red-team, second-order-effects, investigation, evidence-strength, and assumption-surfacing. Each pack is a prompt file following a uniform interface format. e-build skill gains a Phase 4.5 e-think hook that auto-dispatches packs after verification. Standalone e-think state lives under `.agent-log/<timestamp>-e-think/`; e-build integration writes e-think-prefixed artifacts into the e-build state directory.
 
 **Tech Stack:** Claude Code skills (SKILL.md + prompts), file-based state, subagent dispatch
 
@@ -194,14 +194,14 @@ downstream:
   "strongest_counter_evidence": "...",
   "risks": ["..."],
   "next_action": "...",
-  "downstream_pack": "root-cause | 复现实验"
+  "downstream_pack": "root-cause | reproduce"
 }
 ```
 
 ## 下游接口
 
 - 真成功 + 证据强 → root-cause（找到可复制成因）
-- 真成功 + 证据弱 → 复现实验（先确认可复现再放大）
+- 真成功 + 证据弱 → reproduce（先确认可复现再放大）
 - 假成功 → root-cause（找到真正成因）
 - 不确定 → 补充证据（缩小实验范围或增加样本）
 ```
@@ -302,7 +302,7 @@ downstream:
   "preserved_value": ["..."],
   "risks": ["..."],
   "next_action": "...",
-  "downstream_pack": "root-cause | next-experiment | 补全证据"
+  "downstream_pack": "root-cause | next-experiment | evidence-strength"
 }
 ```
 
@@ -310,7 +310,7 @@ downstream:
 
 - 真失败 → root-cause（区分失败类型，找到根因）
 - 假失败 → next-experiment（保留有效信号，重设指标或时间窗口）
-- 不确定 → 补全证据（增加观察时间或换指标）
+- 不确定 → evidence-strength（增加观察时间或换指标）
 ```
 
 **Step 3: Create root-cause.md (根因分析包)**
@@ -623,7 +623,7 @@ downstream:
   "review_pack": "verify-success | verify-failure",
   "risks": ["..."],
   "next_action": "执行实验",
-  "downstream_pack": "verify-success | verify-failure"
+  "downstream_pack": "done"
 }
 ```
 
@@ -632,7 +632,7 @@ downstream:
 - 实验执行后 → verify-success 或 verify-failure（根据实验结果选择入口）
 ```
 
-**Step 6: Commit all 5 prompts**
+**Step 6: Commit all e-think prompts**
 
 ```bash
 git add skills/e-think/prompts/
@@ -745,7 +745,7 @@ For the selected pack (and each subsequent pack in the chain):
 3. The subagent writes both the markdown report and JSON output to `{state_dir}/`.
 4. Read the JSON output. If `downstream_pack` points to another pack, loop back to step 1 with that pack.
 5. Append to `session.md`: "[<pack-name>] <timestamp> — conclusion: <conclusion>, evidence: <level>, downstream: <next>"
-6. Continue until `downstream_pack` is terminal (done) or all 5 packs have been executed.
+6. Continue until `downstream_pack` is terminal (`done`) or the chain depth limit has been reached.
 
 ## Phase 2: Summary
 
@@ -774,7 +774,7 @@ When called with `--from-e-build`, the e-think skill reads from and writes to th
 **Entry pack**: [which pack was triggered]
 **Chain**: [pack1] → [pack2] → ... → [packN]
 **Conclusion**: [final conclusion]
-**Recommendation**: [continue fixing | narrow scope | proceed to Phase 6 | redesign]
+**Recommendation**: [continue-fixing | narrow-scope | re-verify | proceed | deep-analysis]
 ```
 
 ## Common Mistakes
@@ -877,7 +877,7 @@ Choose one:
 - **continue-fixing**: Issues are real, proceed to Phase 5 Fix with focused scope from root-cause analysis
 - **narrow-scope**: Evidence is weak or uncertain, go back to Phase 3 with a smaller scope
 - **re-verify**: Metrics may be wrong, go back to Phase 4 with adjusted verification
-- **proceed**: Success is genuine, proceed to Phase 6 Knowledge Extraction
+- **proceed**: Success is genuine for the current outer iteration; skip Phase 5 and enter the e-build iteration loop. Phase 6 runs only when the loop stops or reaches `--iterations N`.
 - **deep-analysis**: Root cause is complex, run root-cause and main-contradiction packs before fixing
 
 ## Reasoning
@@ -897,7 +897,7 @@ Choose one:
 ## Rules
 
 - This is Phase 4.5 — it sits between Phase 4 (Verify) and Phase 5 (Fix).
-- Do NOT modify any existing files except session.md (append only).
+- Modify only the e-think output artifacts for the latest verification pass and append to session.md.
 - The recommendation determines what the e-build skill does next. Be precise.
 - If evidence level is "弱" for either pass or fail, default to recommending re-verify or narrow-scope rather than proceeding.
 ```
@@ -914,7 +914,7 @@ You are the e-think-hook agent. Your job is to evaluate the fix cycle results an
 ## Input
 
 - State directory: `{state_dir}`
-- Current iteration: {iteration_number}
+- Current outer iteration: {current_iteration}
 
 ## Context
 
@@ -1142,13 +1142,13 @@ test -f skills/e-build/prompts/e-think-hook-iterate.md && echo "OK: e-think-hook
 
 **Step 3: Verify JSON schema fields are consistent across packs**
 
-All 5 pack JSON outputs should have: `pack`, `timestamp`, `conclusion` (or `hypothesis` for next-experiment), `downstream_pack`.
+All e-think pack JSON outputs should have: `pack`, `timestamp`, `conclusion`, `next_action`, and `downstream_pack`.
 
 ```bash
 grep -c "downstream_pack" skills/e-think/prompts/*.md
 ```
 
-Expected: all 5 prompt files should reference `downstream_pack`.
+Expected: every prompt file in `skills/e-think/prompts/` should reference `downstream_pack`.
 
 **Step 4: Verify shared reference exists**
 

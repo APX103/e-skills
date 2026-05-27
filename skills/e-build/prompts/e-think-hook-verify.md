@@ -15,6 +15,23 @@ Read these files for context:
 - `{state_dir}/understanding.md` — original requirements
 - `{state_dir}/plan.md` — what was planned
 
+## Output Files
+
+This hook is expected to write analysis artifacts. The allowed outputs are:
+
+- `{state_dir}/e-think-verify-success.md` and `{state_dir}/e-think-verify-success.json` for PASS results
+- `{state_dir}/e-think-verify-failure.md` and `{state_dir}/e-think-verify-failure.json` for FAIL/PARTIAL results
+- `{state_dir}/e-think-evidence-strength.md` and `{state_dir}/e-think-evidence-strength.json` when the evidence quality gate runs
+- `{state_dir}/e-think-reproduce.md` and `{state_dir}/e-think-reproduce.json` when the reproduction gate runs
+- `{state_dir}/e-think-root-cause.md` and `{state_dir}/e-think-root-cause.json` when recommending `deep-analysis`
+- `{state_dir}/e-think-main-contradiction.md` and `{state_dir}/e-think-main-contradiction.json` when root cause analysis finds multiple interacting conditions
+- `{state_dir}/e-think-recommendation.md` for the final routing decision
+- `{state_dir}/session.md` append-only log entry
+
+Do not modify project source files or earlier state files such as `understanding.md`, `plan.md`, or `verify-report.md`.
+
+When reusing an e-think pack prompt inside this hook, adapt the pack's default output paths to the e-build-prefixed paths listed above. For example, `verify-success.md` becomes `e-think-verify-success.md`. Do not write the unprefixed pack output files in an e-build state directory.
+
 ## Instructions
 
 1. Read `verify-report.md` and determine: Did verification pass or fail?
@@ -31,6 +48,7 @@ Read these files for context:
      - 可用证据 = the verification method outputs
    - Execute the analysis steps from the prompt.
    - Write the output to `{state_dir}/e-think-verify-success.md` and `{state_dir}/e-think-verify-success.json`.
+   - Recommend `proceed` only when the result is 真成功 and evidence is strong enough for the selected verification methods. Otherwise recommend `re-verify` or `narrow-scope`.
 
 1. **If FAIL (any checks failed):**
    - Invoke the **verify-failure** thinking pack.
@@ -45,6 +63,7 @@ Read these files for context:
      - 可用证据 = the verification method outputs
    - Execute the analysis steps from the prompt.
    - Write the output to `{state_dir}/e-think-verify-failure.md` and `{state_dir}/e-think-verify-failure.json`.
+   - If the result is 真失败 and the root cause is unclear or complex, run root-cause before writing the final recommendation.
 
 1. **If PASS, optionally run evidence-strength as quality gate:**
    - If the verification evidence feels thin (e.g., only one verification method, or results are borderline), invoke the **evidence-strength** thinking pack.
@@ -63,6 +82,12 @@ Read these files for context:
    - Fill input materials from the e-build state.
    - Execute and write output to `{state_dir}/e-think-reproduce.md` and `{state_dir}/e-think-reproduce.json`.
    - If reproduce concludes "无法复现", consider downgrading to "narrow-scope" or "re-verify".
+
+1. **If root-cause analysis is needed before fixing:**
+   - Invoke the **root-cause** thinking pack and write `{state_dir}/e-think-root-cause.md` and `{state_dir}/e-think-root-cause.json`.
+   - If root-cause finds 3+ interacting system conditions, also invoke **main-contradiction** and write `{state_dir}/e-think-main-contradiction.md` and `{state_dir}/e-think-main-contradiction.json`.
+   - Include the focused repair target in the recommendation reasoning.
+   - Prefer `continue-fixing` after this analysis has completed. Use `deep-analysis` only if root-cause/main-contradiction could not be completed and must be run by the orchestrator before fixing.
 
 1. **Based on the thinking pack result(s), write a recommendation to `{state_dir}/e-think-recommendation.md`:**
 
@@ -84,8 +109,8 @@ Choose one:
 - **continue-fixing**: Issues are real, proceed to Phase 5 Fix with focused scope from root-cause analysis
 - **narrow-scope**: Evidence is weak or uncertain, go back to Phase 3 with a smaller scope
 - **re-verify**: Metrics may be wrong, go back to Phase 4 with adjusted verification
-- **proceed**: Success is genuine, proceed to Phase 6 Knowledge Extraction
-- **deep-analysis**: Root cause is complex, run root-cause and main-contradiction packs before fixing
+- **proceed**: Success is genuine for the current outer iteration; skip Phase 5 and enter the e-build iteration loop. Phase 6 runs only when that loop stops or reaches `--iterations N`.
+- **deep-analysis**: Root cause analysis is required but could not be completed in this hook; the orchestrator must run root-cause/main-contradiction before fixing
 
 Note: If evidence-strength or reproduce were run, their conclusions should inform this recommendation. Evidence-strength "证据不足" → prefer re-verify or narrow-scope. Reproduce "无法复现" → prefer narrow-scope or re-verify.
 
@@ -106,6 +131,6 @@ Note: If evidence-strength or reproduce were run, their conclusions should infor
 ## Rules
 
 - This is Phase 4.5 — it sits between Phase 4 (Verify) and Phase 5 (Fix).
-- Do NOT modify any existing files except session.md (append only).
+- Modify only the output files listed above. Append to `session.md`; overwrite the other e-think output files for the latest verification pass.
 - The recommendation determines what the e-build skill does next. Be precise.
 - If evidence level is "弱" for either pass or fail, default to recommending re-verify or narrow-scope rather than proceeding.

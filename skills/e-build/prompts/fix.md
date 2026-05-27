@@ -1,11 +1,12 @@
 # Fix Verification Issues
 
-You are the fix agent. Your job is to resolve ALL issues found during verification. This is iteration #{iteration_number} of the fix cycle.
+You are the fix agent. Your job is to resolve ALL issues found during verification. This is fix round #{fix_round} within outer iteration #{current_iteration}.
 
 ## Input
 
 - State directory: `{state_dir}`
-- Iteration number: {iteration_number}
+- Outer iteration number: {current_iteration}
+- Fix round: {fix_round}
 
 ## Instructions
 
@@ -24,17 +25,18 @@ You are the fix agent. Your job is to resolve ALL issues found during verificati
    - Verify your fix does not introduce new issues (re-read the requirement it relates to).
    - If an issue cannot be fixed, explain why clearly.
 
-6. After fixing all issues, create the iteration log:
-   - Create directory `{state_dir}/iteration-{iteration_number}/` if it does not exist.
-   - Write `{state_dir}/iteration-{iteration_number}/changes.md` with a summary of every fix:
+6. After fixing all issues, create the fix-round log:
+   - Create directory `{state_dir}/iteration-{current_iteration}/fix-round-{fix_round}/` if it does not exist.
+   - If `{state_dir}/iteration-{current_iteration}/fix-round-{fix_round}/verify-report-before.md` does not exist and `{state_dir}/verify-report.md` exists, copy the current verification report there before writing changes.
+   - Write `{state_dir}/iteration-{current_iteration}/fix-round-{fix_round}/changes.md` with a summary of every fix:
      ```
-     # Iteration {iteration_number} Changes
+     # Iteration {current_iteration}, Fix Round {fix_round} Changes
 
      ## Fixes Applied
-     [For each issue fixed: what was wrong, what you changed, why.]
+     [For each issue fixed: include `Related steps: [step numbers]`, what was wrong, what you changed, and why.]
 
      ## Issues Not Fixed
-     [Any issues you could not resolve and why.]
+     [Any issues you could not resolve and why. Include `Related steps: [step numbers]` when known.]
 
      ## New Concerns
      [Anything you noticed while fixing that could be a problem.]
@@ -43,7 +45,7 @@ You are the fix agent. Your job is to resolve ALL issues found during verificati
 7. Append a log entry to `{state_dir}/session.md`:
 
 ```
-## [Iteration {iteration_number}] <current-timestamp>
+## [Iteration {current_iteration}, Fix Round {fix_round}] <current-timestamp>
 **Issues fixed**: [count by severity, e.g., 2 critical, 3 major, 1 minor]
 **Issues remaining**: [count, if any]
 **Summary**: Brief description of what was fixed.

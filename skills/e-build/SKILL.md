@@ -26,18 +26,31 @@ All state in files under `.agent-log/<timestamp>-e-build/`:
 session.md           # Master log: head=goal, tail=progress
 understanding.md     # Phase 1 output
 plan.md              # Phase 2 output
-verify-report.md     # Phase 4 output
+verify-report.md     # Latest Phase 4 output
+verify-history/
+  verify-report-<timestamp>.md  # Previous verification reports
 e-think-verify-success.md   # Phase 4.5 verify-success analysis
 e-think-verify-success.json
 e-think-verify-failure.md   # Phase 4.5 verify-failure analysis
 e-think-verify-failure.json
+e-think-evidence-strength.md       # Optional evidence quality gate
+e-think-evidence-strength.json
+e-think-reproduce.md               # Optional reproduction gate
+e-think-reproduce.json
 e-think-recommendation.md   # Phase 4.5 recommendation
 e-think-root-cause.md       # Deep analysis (if triggered)
 e-think-root-cause.json
 e-think-main-contradiction.md
 e-think-main-contradiction.json
+e-think-assumption-surfacing.md
+e-think-assumption-surfacing.json
+e-think-second-order-effects.md
+e-think-second-order-effects.json
 e-think-iterate-recommendation.md  # Post-fix recommendation
-iteration-N/         # Per-iteration details
+iteration-N/
+  fix-round-M/
+    verify-report-before.md
+    changes.md
 ```
 
 Persistent cross-session knowledge at `$HOME/.claude/e-build-knowledge/`:
@@ -122,13 +135,13 @@ For each step in `plan.md`:
 
 ## Phase 4: Verification
 
-**Before dispatching:** If `verify-report.md` already exists, move it to `verify-report-prev.md` (do not lose history).
+**Before dispatching:** If `verify-report.md` already exists, move it to `verify-history/verify-report-<timestamp>.md` (create the directory if needed). Do not overwrite prior verification reports.
 
 Dispatch subagent (`general-purpose`) with `./prompts/verify.md`: `{state_dir}`, `{verification_methods}`, `{verification_knowledge}`.
 
 Fill `{verification_knowledge}`: read `$HOME/.claude/e-build-knowledge/knowledge/verification.md`, filter by project type tag, include top entries (~1500 tokens max). If file missing, empty, or malformed, set to empty string and proceed without knowledge injection. After dispatch, log to `session.md`: "Applied N entries from M sessions in verify phase." (If zero, log "No prior knowledge available for verify phase.")
 
-Read `verify-report.md`: all PASS → this iteration complete. Any FAIL/PARTIAL → Phase 5.
+Read `verify-report.md` only to ensure it exists and is parseable. Do not decide whether to fix or proceed here; Phase 4.5 is the single decision point after every verification run.
 
 ## Phase 4.5: E-Think Analysis (Post-Verification)
 
@@ -140,18 +153,19 @@ Runs after every Phase 4 verification. Provides deep analysis of the verificatio
    - `continue-fixing` → proceed to Phase 5 Fix. If the e-think analysis identified a specific root cause, include it in the fix context.
    - `narrow-scope` → go back to Phase 3 Execution with a reduced scope (the e-think analysis will specify what to focus on).
    - `re-verify` → go back to Phase 4 with adjusted verification methods.
-   - `proceed` → skip Phase 5, go directly to the iteration loop (this iteration is done).
-   - `deep-analysis` → the e-think-hook-verify agent has already started root-cause analysis. Read `{state_dir}/e-think-root-cause.md` if it exists, then proceed to Phase 5 Fix with focused scope.
+   - `proceed` → skip Phase 5 and enter the iteration loop; the current outer iteration is done, but Phase 6 runs only after the iteration loop decides to stop or reaches `--iterations N`.
+   - `deep-analysis` → run root-cause/main-contradiction analysis before fixing, then return to this decision point. This is a fallback for cases where the hook could not complete deeper analysis itself.
+4. If `e-think-recommendation.md` is missing, malformed, or contains an unknown recommendation, default to `re-verify` once. If it fails again, default to `continue-fixing` and log the fallback in `session.md`.
 
 ## Phase 5: Iteration Fix
 
-1. Increment `fix_round` counter (starts at 1, increments each time Phase 5 runs within the same iteration).
-2. Create `iteration-N/fix-round-{fix_round}/`, copy current `verify-report.md` into it as `verify-report-before.md`.
-3. Dispatch subagent (`general-purpose`) with `./prompts/fix.md`: `{state_dir}`, `{iteration_number}`.
+1. Increment `fix_round` counter (starts at 1, increments each time Phase 5 runs within the current outer iteration).
+2. Create `{state_dir}/iteration-{current_iteration}/fix-round-{fix_round}/`, copy current `verify-report.md` into it as `verify-report-before.md`.
+3. Dispatch subagent (`general-purpose`) with `./prompts/fix.md`: `{state_dir}`, `{current_iteration}`, `{fix_round}`.
 4. Return to Phase 4 (re-verify).
-5. If Phase 4 finds no new issues → this iteration is complete. Go to **Iteration Loop** below.
-6. If Phase 4 still finds issues but fewer than before → continue fixing (stay in Phase 5).
-7. If Phase 4 finds the same or more issues for 2 consecutive fix rounds → log warning, stop fixing within this iteration. Go to **Iteration Loop**.
+5. If Phase 4.5 recommends `proceed` after re-verification → this iteration is complete. Go to **Iteration Loop** below.
+6. If Phase 4.5 recommends `continue-fixing` and issues are fewer than before → continue fixing (stay in Phase 5).
+7. If Phase 4.5 still recommends `continue-fixing` with the same or more issues for 2 consecutive fix rounds → log warning, stop fixing within this iteration. Go to **Iteration Loop**.
 
 ## Iteration Loop
 
@@ -172,7 +186,7 @@ INNER LOOP (fix rounds within one iteration):
 
 1. Initialize `current_iteration = 1`.
 2. Execute Phases 1-5 for `current_iteration`.
-3. After iteration completes (Phase 5 convergence or stall):
+3. After iteration completes (either Phase 4.5 recommended `proceed`, or Phase 5 converged/stalled):
    - Dispatch e-think-hook-iterate subagent with `./prompts/e-think-hook-iterate.md`: `{state_dir}`, `{current_iteration}`.
    - Read `{state_dir}/e-think-iterate-recommendation.md`. Follow the recommendation:
      - `stop-iterate` → proceed to Phase 6.
@@ -197,8 +211,9 @@ INNER LOOP (fix rounds within one iteration):
 
 Runs after the iteration loop completes (success or max iterations reached).
 
-1. Dispatch subagent (`general-purpose`) with `./prompts/extract-knowledge.md` filled: `{state_dir}`, `{knowledge_dir}` = `$HOME/.claude/e-build-knowledge`. Then dispatch subagent with `./prompts/extract-metrics.md` filled: `{state_dir}`, `{knowledge_dir}`, `{skill_dir}` (the directory containing this skill's prompts, typically resolved from the skill installation path).
-2. After extraction, check if any knowledge file exceeds ~200 lines; if so, dispatch compaction subagent with `./prompts/compact-knowledge.md`: `{knowledge_dir}`.
+1. Dispatch subagent (`general-purpose`) with `./prompts/extract-knowledge.md` filled: `{state_dir}`, `{knowledge_dir}` = `$HOME/.claude/e-build-knowledge`.
+2. Dispatch subagent (`general-purpose`) with `./prompts/extract-metrics.md` filled: `{state_dir}`, `{knowledge_dir}`, `{skill_dir}` (the directory containing this skill's prompts, typically resolved from the skill installation path).
+3. After extraction, check if any knowledge file exceeds ~200 lines; if so, dispatch compaction subagent with `./prompts/compact-knowledge.md`: `{knowledge_dir}`.
 
 ## Phase 7: Prompt Evolution (Self-Improvement)
 

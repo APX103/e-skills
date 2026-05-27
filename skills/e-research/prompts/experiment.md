@@ -56,3 +56,21 @@ Write `{state_dir}/experiment-N.md`:
 ## Stop / Pivot Conditions
 [when to stop, retry, or change direction]
 ```
+
+After executing the experiment, write `{state_dir}/experiment-N-results.md` and update `{state_dir}/evidence-ledger.md`:
+
+```markdown
+# Experiment N Results
+
+## Result
+[success / failure / inconclusive]
+
+## Evidence
+[commands, observations, files, or data]
+
+## Interpretation
+[what changed in belief and why]
+
+## Gaps
+[what remains unknown]
+```

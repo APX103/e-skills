@@ -359,7 +359,7 @@
           <p>个人级 skill 放在：</p>
           <pre><code>~/.claude/skills/e-research/SKILL.md</code></pre>
           <p>这个仓库已经通过 symlink 安装到了这个位置：</p>
-          <pre><code>~/.claude/skills/e-research -> /Users/lijialun/work/engineer_skills/skills/e-research/</code></pre>
+          <pre><code>~/.claude/skills/e-research -> /path/to/e-skills/skills/e-research/</code></pre>
         </div>
         <div class="platform">
           <h3><span class="mark claude"></span>调用方式</h3>
@@ -378,10 +378,10 @@
         <div class="platform">
           <h3><span class="mark codex"></span>安装位置</h3>
           <p>本机已额外链接到 Codex 用户级 skills 目录：</p>
-          <pre><code>~/.codex/skills/e-research -> /Users/lijialun/work/engineer_skills/skills/e-research</code></pre>
+          <pre><code>~/.codex/skills/e-research -> /path/to/e-skills/skills/e-research</code></pre>
           <p>如果你在另一台机器上使用，可以手动复制或链接：</p>
           <pre><code>mkdir -p ~/.codex/skills
-ln -s /path/to/engineer_skills/skills/e-research ~/.codex/skills/e-research</code></pre>
+ln -s /path/to/e-skills/skills/e-research ~/.codex/skills/e-research</code></pre>
         </div>
         <div class="platform">
           <h3><span class="mark codex"></span>调用方式</h3>
@@ -407,7 +407,7 @@ ln -s /path/to/engineer_skills/skills/e-research ~/.codex/skills/e-research</cod
           <p>如果 Hermes 已经 clone 了这个仓库，直接在仓库根目录运行：</p>
           <pre><code>./install.sh update</code></pre>
           <p>这会创建或更新这个链接：</p>
-          <pre><code>~/.hermes/skills/e-research -> /Users/lijialun/work/engineer_skills/skills/e-research</code></pre>
+          <pre><code>~/.hermes/skills/e-research -> /path/to/e-skills/skills/e-research</code></pre>
         </div>
         <div class="platform">
           <h3><span class="mark hermes"></span>调用方式</h3>

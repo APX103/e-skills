@@ -25,13 +25,13 @@ Do not use for one-off explanations, direct coding tasks, simple bug fixes, or r
 
 ## Core Loop
 
-1. **Create a Research Charter**: If the question, scope, evidence standard, or stop condition is unclear, use `brainstorming` once to clarify the task. Then fill `prompts/charter.md`.
+1. **Create a Research Charter**: If the question, scope, evidence standard, or stop condition is unclear, use `brainstorming` once to clarify the task. Then use `prompts/charter.md` as the template and write `{state_dir}/charter.md`.
 2. **Set up state**: Store all research state in `.agent-log/<YYYY-MM-DD-HHMMSS>-research/`.
 3. **Investigate**: Gather the smallest useful evidence set. Use local files first; browse when recency or external sources matter. Use `e-think --pack investigation` or `assumption-surfacing` when unknowns dominate.
-4. **Design experiments**: Use `prompts/experiment.md` or `e-think --pack next-experiment`. Change one important variable at a time.
+4. **Design experiments**: Use `prompts/experiment.md` as the template for `{state_dir}/experiment-N.md`, or use `e-think --pack next-experiment`. Change one important variable at a time.
 5. **Execute**: Run experiments directly when small. Use `e-build` when the experiment requires code, environments, tests, benchmarks, or iterative fixes.
-6. **Review evidence**: Use `e-think` packs such as `verify-success`, `verify-failure`, `reproduce`, and `evidence-strength`.
-7. **Synthesize**: Use `prompts/synthesis.md` to produce claims, evidence, limitations, and reusable knowledge.
+6. **Review evidence**: Use `e-think` packs such as `verify-success`, `verify-failure`, `reproduce`, and `evidence-strength`. After each experiment, update `{state_dir}/evidence-ledger.md` with claims, evidence pointers, confidence, and unresolved gaps.
+7. **Synthesize**: Use `prompts/synthesis.md` as the template for `{state_dir}/report.md` and `{state_dir}/knowledge.md`, producing claims, evidence, limitations, and reusable knowledge.
 
 ## Human Gates
 
@@ -48,6 +48,7 @@ Otherwise, proceed autonomously and keep the state files current.
 
 - Separate facts, hypotheses, interpretations, and speculation.
 - Every important claim needs an evidence pointer or an explicit "unknown".
+- Each experiment result should update `evidence-ledger.md`; final synthesis should not rely on unindexed evidence.
 - Prefer reproducible experiments over persuasive prose.
 - Record failed experiments; they are research output.
 - Stop when the charter's success criteria or stop conditions are met.

@@ -423,6 +423,14 @@ experiment-N.md
 experiment-N-results.md
 ```
 
+推荐生命周期：
+
+```text
+charter.md -> experiment-N.md -> experiment-N-results.md -> evidence-ledger.md -> report.md / knowledge.md
+```
+
+每轮实验结果都应回写 `evidence-ledger.md`。最终 `report.md` 的重要结论应能追溯到某个实验结果、验证输出或明确标注为 unknown。
+
 ## Hermes 安装说明
 
 如果你要让 Hermes 自己安装本仓库的研究 skill，直接把这份文档交给它：
@@ -485,10 +493,21 @@ description: Use when ...
 
 ```bash
 bash -n install.sh
-rg -n "TBD|TODO|PLACEHOLDER|\\?\\?\\?" skills docs
+git diff --check
+python3 scripts/validate_protocol.py
 ```
 
-如果修改 HTML：
+`scripts/validate_protocol.py` 会集中检查 skill/prompt frontmatter、HTML 解析、临时 `HOME` 安装 smoke test、协议残留扫描，以及 `e-think` 的 `downstream_pack` 不变量。它不能证明 prompt 语义一定正确，但可以防止常见的路径、状态文件、安装和 JSON 链路漂移。
+
+更多说明见 `docs/protocol-validation.md`。
+
+如果要检查一次研究任务的最终产物是否完整：
+
+```bash
+python3 scripts/validate_protocol.py --research-state .agent-log/<timestamp>-research
+```
+
+如果只想手动检查 HTML：
 
 ```bash
 python3 - <<'PY'
@@ -504,11 +523,10 @@ PY
 ### 安装脚本验证
 
 ```bash
-./install.sh update
-test -f ~/.hermes/skills/e-research/SKILL.md
-test -f ~/.claude/skills/e-research/SKILL.md
-test -f ~/.codex/skills/e-research/SKILL.md
+python3 scripts/validate_protocol.py
 ```
+
+安装 smoke test 使用临时 `HOME`，不会覆盖真实的 `~/.claude/skills`、`~/.codex/skills`、`~/.hermes/skills` 或 `~/.agents/skills`。
 
 ## 排障
 

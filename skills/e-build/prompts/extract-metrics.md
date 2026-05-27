@@ -30,14 +30,14 @@ Read the following files from `{state_dir}` (if they exist):
 | `understanding.md` | What requirements were identified, task type, constraints |
 | `plan.md` | What steps were planned, their dependencies and risk levels |
 | `verify-report.md` | What issues were found, severity breakdown, which requirements passed/failed |
-| `iteration-N/changes.md` | What was fixed in each iteration and why |
+| `iteration-N/fix-round-M/changes.md` | What was fixed in each fix round and why |
 
 **Missing files**: Not all files will exist. A session that failed during understanding will have no plan. A session that failed during execution will have no verify-report. Handle missing files gracefully:
 
 - If `session.md` is missing: you cannot proceed. Log a warning to stderr and exit.
 - If `plan.md` is missing: set `total_steps_planned` to 0 and note that the session did not reach the planning phase. Set `session_outcome` to "failed".
 - If `verify-report.md` is missing: set `verification_methods` to an empty array and `verification_effectiveness` to an empty object.
-- If no `iteration-N/changes.md` directories exist: the session had zero fix iterations. Set `steps_passed_first_try` equal to `total_steps_planned`, `steps_needing_fixes` to 0, `total_fix_iterations` to 0, and `convergence_pattern` to "no-issues".
+- If no `iteration-N/fix-round-M/changes.md` files exist: the session had zero fix rounds. Set `steps_passed_first_try` equal to `total_steps_planned`, `steps_needing_fixes` to 0, `total_fix_iterations` to 0, and `convergence_pattern` to "no-issues".
 
 ### 2. Extract the session ID
 
@@ -83,24 +83,24 @@ From the session files, extract each metric:
 - If `plan.md` does not exist, set to 0.
 
 **`steps_passed_first_try`** (integer):
-- Count steps that have no mention in any `iteration-N/changes.md`.
+- Count steps that have no mention in any `iteration-N/fix-round-M/changes.md`.
 - If a step number does not appear in any changes file, it passed on the first try.
 - If `plan.md` does not exist, set to 0.
 
 **`steps_needing_fixes`** (integer):
-- Count distinct steps that appear in at least one `iteration-N/changes.md`.
+- Count distinct steps that appear in at least one `iteration-N/fix-round-M/changes.md`.
 - Equivalent to `total_steps_planned - steps_passed_first_try`.
 
 **`total_fix_iterations`** (integer):
-- Count the number of `iteration-N/` directories under `{state_dir}`.
-- Each directory represents one pass through the verify -> fix loop.
+- Count the number of `fix-round-M/` directories under all `{state_dir}/iteration-N/` directories.
+- Each fix-round directory represents one pass through the verify -> fix loop.
 
 **`convergence_pattern`** (enum: `"decreasing"` | `"stable"` | `"increasing"` | `"no-issues"`):
 - `"no-issues"`: zero fix iterations (nothing needed fixing).
 - `"decreasing"`: issues decreased across iterations (e.g., 5 issues in iteration 1, 2 in iteration 2, 0 in iteration 3).
 - `"stable"`: issue count stayed roughly the same across iterations.
 - `"increasing"`: issues increased or new issues kept appearing.
-- Determine this by reading the number of entries or severity in each `iteration-N/changes.md`.
+- Determine this by reading the number of entries or severity in each `iteration-N/fix-round-M/changes.md`.
 
 **`verification_methods`** (array of strings):
 - Extract from the Verification Plan section of `session.md` (if present) or from `verify-report.md`.
@@ -116,16 +116,16 @@ From the session files, extract each metric:
 - Example: `{ "automated-testing": "caught-issues", "code-review": "missed-issues" }`
 
 **`common_root_causes`** (array of strings):
-- Extract recurring failure patterns from `iteration-N/changes.md`.
+- Extract recurring failure patterns from `iteration-N/fix-round-M/changes.md`.
 - Classify root causes into general categories, not project-specific ones.
 - Common categories: `"missing-edge-case-handling"`, `"incorrect-api-usage"`, `"missing-dependency"`, `"wrong-configuration"`, `"incomplete-implementation"`, `"type-mismatch"`, `"race-condition"`, `"insufficient-error-handling"`.
 - If no fix iterations occurred, use an empty array.
 
 **`session_outcome`** (enum: `"success"` | `"partial"` | `"failed"`):
-- `"success"`: all planned steps passed verification, zero fix iterations needed.
-- `"partial"`: most steps passed but some needed fixes, or the session completed with remaining known issues.
+- `"success"`: the final verification passed all required checks, even if earlier fix rounds were needed.
+- `"partial"`: the session completed with remaining known issues or skipped verification that was part of the contract.
 - `"failed"`: the session did not complete (e.g., stuck in a fix loop, abandoned, or critical steps could not be implemented).
-- Check the final status in `session.md` if available.
+- Check the final status in `session.md` and the latest `verify-report.md`. Use `total_fix_iterations` to measure repair effort, not to downgrade a successful final outcome.
 
 ### 6. Construct the session JSON object
 

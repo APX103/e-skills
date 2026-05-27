@@ -90,7 +90,15 @@ case "$ACTION" in
         echo "Done. Installed skills:"
         for target_dir in "${TARGET_DIRS[@]}"; do
             echo "  $target_dir"
-            ls -la "$target_dir" 2>/dev/null | grep "engineer_skills/skills/" | awk '{print "    " $NF " -> " $(NF-1) " " $(NF-2)}' || true
+            for target in "$target_dir"/*; do
+                [ -L "$target" ] || continue
+                link_target="$(readlink "$target")"
+                case "$link_target" in
+                    "$SKILLS_DIR"/skills/*|"$SKILLS_DIR"/skills/*/)
+                        echo "    $(basename "$target") -> $link_target"
+                        ;;
+                esac
+            done
         done
         echo ""
         echo "Skills are symlinked into Claude Code, Codex, Hermes, and generic agent skill directories."

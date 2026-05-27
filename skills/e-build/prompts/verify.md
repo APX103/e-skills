@@ -75,6 +75,12 @@ Write the verification report to `{state_dir}/verify-report.md`:
 ## Summary
 [Overall assessment: pass / needs fixes. Brief summary.]
 
+## Commands Run
+[Every command, tool, or manual check actually run. Include "not run" with a reason for any requested method that could not run.]
+
+## Evidence
+[Concrete evidence supporting the summary: command outcomes, test counts, inspected files, screenshots, logs, or requirement-by-requirement observations.]
+
 ## Issues
 
 ### Critical
@@ -91,6 +97,9 @@ Write the verification report to `{state_dir}/verify-report.md`:
 
 ## Requirements Checklist
 [For design-comparison: every requirement with its status.]
+
+## Residual Risks / Gaps
+[Anything not verified, any weak evidence, flaky checks, missing tests, environmental limits, or assumptions that e-think should consider.]
 ```
 
 Prioritize issues by severity. A critical issue means the build cannot proceed. A major issue means significant rework is needed. A minor issue is a polish item.
